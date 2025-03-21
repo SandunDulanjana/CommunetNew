@@ -9,6 +9,9 @@ config();
 import connect_DB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
 import memberRouter from './routes/memberRoute.js';
+import annoucementRoute from '../BACKEND/routes/annoucemntRoute.js';
+import rulesRouter from '../BACKEND/routes/rulesRoutes.js';
+
 
 
 
@@ -25,7 +28,8 @@ app.use(express.json());
 
 //api endpoints
 app.use('/api/member',memberRouter);
-
+app.use("/api/annoucement",annoucementRoute);
+app.use("/api/rules",rulesRouter);
 
 app.get('/',(req,res) => {
     res.send('API WORKING '); 
