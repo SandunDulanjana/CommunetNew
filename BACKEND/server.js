@@ -9,6 +9,7 @@ config();
 import connect_DB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
 import memberRouter from './routes/memberRoute.js';
+import eventRouter from '../BACKEND/routes/eventRoute.js'
 
 
 
