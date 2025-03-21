@@ -25,7 +25,7 @@ app.use(express.json());
 
 //api endpoints
 app.use('/api/member',memberRouter);
-
+app.use('/api/event', eventRouter);
 
 app.get('/',(req,res) => {
     res.send('API WORKING '); 
