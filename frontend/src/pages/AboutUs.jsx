@@ -1,8 +1,11 @@
 import React from 'react';
+import Footer from '../componenets/Footer'
 
 function AboutUs() {
   return (
-    <div>AboutUs</div>
+    <div>AboutUs
+      <Footer/>
+    </div>
   )
 }
 
