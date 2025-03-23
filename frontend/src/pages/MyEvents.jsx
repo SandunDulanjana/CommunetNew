@@ -1,9 +1,10 @@
 import React from 'react'
 import Footer from '../componenets/Footer'
 
-function MyEvents() {
+const MyEvents = () =>{
   return (
-    <div>MyEvents
+    <div>
+      
       <Footer/>
     </div>
   )
