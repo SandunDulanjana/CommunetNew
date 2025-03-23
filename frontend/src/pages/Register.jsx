@@ -1,21 +1,29 @@
-import React from "react";
+import {useState} from "react";
 import { NavLink } from "react-router-dom"; // Import NavLink
 import apartmentImage from "../assets/aprtmentL.jpg";
 
 const Register = () => {
+
+    const[email, setEmail] = useState('')
+    const[password, setPassword] = useState('')
+    const[name, setName] = useState('')
+  
+    const onSubmitHandler = async(event) =>{
+     event.preventDefault()}
+    
   return (
-    <div className="flex items-center justify-center min-h-screen bg-cover bg-center bg-no-repeat"
+    <div className="flex items-center justify-center min-h-screen bg-cover bg-center bg-no-repeat rounded-xl"
       style={{ backgroundImage: `url(${apartmentImage})` }}>
 
       <div className="bg-white p-8 rounded-2xl shadow-lg w-96">
         <h2 className="text-2xl font-bold text-center text-sky-950">Register</h2>
         <form>
           <div className="mb-4">
-            <label className="block text-sky-950 text-sm mb-2">Name</label>
+            <label className="block text-sky-950 text-sm mb-2">HouseNO</label>
             <input
               type="text"
               className="w-full p-3 rounded-lg bg-slate-400 border border-slate-400 text-gray-900 placeholder-gray-700 focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your name"
+              placeholder="Enter your HouseNO"
               required
             />
           </div>

@@ -9,6 +9,7 @@ config();
 import connect_DB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
 import memberRouter from './routes/memberRoute.js';
+import userRouter from '../BACKEND/routes/UserRoute.js';
 
 
 
@@ -25,6 +26,7 @@ app.use(express.json());
 
 //api endpoints
 app.use('/api/member',memberRouter);
+app.use('/api/user',userRouter);
 
 
 app.get('/',(req,res) => {

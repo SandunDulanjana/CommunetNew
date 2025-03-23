@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import apartmentImage from "../assets/aprtmentL.jpg"
 
 const LogIn = () => {
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-cover bg-center bg-no-repeat"
-    style={{ backgroundImage: `url(${apartmentImage})` }}>
+    <div
+  className="flex items-center justify-center min-h-screen bg-cover bg-center bg-no-repeat rounded-xl"
+  style={{ backgroundImage: `url(${apartmentImage})` }}>
+
+
 
       <div className="bg-white p-8 rounded-2xl shadow-lg w-96">
         <h2 className="text-2xl font-bold text-center text-sky-950">Login</h2>

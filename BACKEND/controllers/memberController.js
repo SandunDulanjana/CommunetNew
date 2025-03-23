@@ -2,12 +2,14 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import { v2 as cloudinary } from "cloudinary";
 import memberModel from "../models/memberModel.js";
+import jwt from 'jsonwebtoken';
+
 
 
 //API for add user data
 const addMember = async (req, res) => {
     try {
-        const { name, email, Password, houseNO, phoneNumber, bio, gender, NIC } = req.body;
+        const { name, phoneNumber, bio, gender, NIC } = req.body;
         const imageFile = req.file;
 
         // Check if all required data is present
@@ -43,15 +45,12 @@ const addMember = async (req, res) => {
         // Create member data
         const memberData = {
             name,
-            email,
             image: imageUrl, // Only set the image URL if an image is uploaded
-            Password: hashedPassword,
-            houseNO,
             phoneNumber,
             bio,
             gender,
             NIC,
-            date: Date.now(),
+            
         };
 
         // Create new member in the database

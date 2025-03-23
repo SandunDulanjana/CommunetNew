@@ -1,12 +1,12 @@
 import React from 'react'
 import Footer from '../componenets/Footer'
 
-function ContactUs() {
+function MyMaintance() {
   return (
-    <div>ContactUs
+    <div>MyMaintance
       <Footer/>
     </div>
   )
 }
 
-export default ContactUs
+export default MyMaintance

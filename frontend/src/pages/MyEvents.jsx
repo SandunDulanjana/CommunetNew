@@ -1,12 +1,12 @@
 import React from 'react'
 import Footer from '../componenets/Footer'
 
-function ContactUs() {
+function MyEvents() {
   return (
-    <div>ContactUs
+    <div>MyEvents
       <Footer/>
     </div>
   )
 }
 
-export default ContactUs
+export default MyEvents
