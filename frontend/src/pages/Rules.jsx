@@ -1,8 +1,11 @@
 import React from 'react'
+import Footer from '../componenets/Footer'
 
 function Rules() {
   return (
-    <div>Rules</div>
+    <div>Rules
+      <Footer/>
+    </div>
   )
 }
 
