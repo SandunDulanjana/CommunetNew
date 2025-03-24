@@ -7,11 +7,12 @@ const eventSchema = new mongoose.Schema({
         organizarName : {type:String, required: true},
         discription : {type:String, required: true},
         date : {type:String, required: true},
-        time : {type:Number, required: true},
+        time : {type:String, required: true},
         venue : {type:String, required: true},
         organizarContactNo : {type:String, required: true},
         organizarEmail : {type:String, required: true},
-        expectedCount : {type:Number, required: true}
+        expectedCount : {type:Number, required: true},
+        status : {type:String, required: false},
 
 })
 
