@@ -41,8 +41,62 @@ const RUserProfile = () => {
           )}
         </div>
 
-        {/* Other Profile Fields */}
-        <p className="text-gray-600 text-center">{userData.email}</p>
+        <div className="text-center mt-4">
+          {isEdit ? (
+            <input
+              className="w-full p-2 bg-white rounded-md border border-cyan-400"
+              type="text"
+              value={userData.email}
+              onChange={(e) => setUserData((prev) => ({ ...prev, name: e.target.value }))}
+            />
+          ) : (
+            <p className="text-xl font-semibold">{userData.email}</p>
+          )}
+        </div>
+
+
+        <div className="text-center mt-4">
+          {isEdit ? (
+            <input
+              className="w-full p-2 bg-white rounded-md border border-cyan-400"
+              type="text"
+              value={userData.name}
+              onChange={(e) => setUserData((prev) => ({ ...prev, name: e.target.value }))}
+            />
+          ) : (
+            <p className="text-xl font-semibold">{userData.name}</p>
+          )}
+        </div>
+
+
+        <div className="text-center mt-4">
+          {isEdit ? (
+            <input
+              className="w-full p-2 bg-white rounded-md border border-cyan-400"
+              type="text"
+              value={userData.name}
+              onChange={(e) => setUserData((prev) => ({ ...prev, name: e.target.value }))}
+            />
+          ) : (
+            <p className="text-xl font-semibold">{userData.name}</p>
+          )}
+        </div>
+
+
+        <div className="text-center mt-4">
+          {isEdit ? (
+            <input
+              className="w-full p-2 bg-white rounded-md border border-cyan-400"
+              type="text"
+              value={userData.name}
+              onChange={(e) => setUserData((prev) => ({ ...prev, name: e.target.value }))}
+            />
+          ) : (
+            <p className="text-xl font-semibold">{userData.name}</p>
+          )}
+        </div>
+       
+        
 
         <div className="mt-4 text-center">
           <button
