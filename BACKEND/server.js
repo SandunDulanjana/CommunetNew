@@ -34,7 +34,7 @@ app.use(cors());
 app.use(express.json());
 
 //api endpoints
-app.use('[/api/member]',memberRouter);
+app.use('/api/member',memberRouter);
 app.use('/api/addmaintenace', maintenanceRoute)
 app.use('/api/user',userRouter);
 app.use("/api/annoucement",annoucementRoute);

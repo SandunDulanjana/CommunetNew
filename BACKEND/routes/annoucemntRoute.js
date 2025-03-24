@@ -10,6 +10,6 @@ annoucementRouter.get('/displayAnnoucemnt/:audience', displayAnnoucemnt);
 
 annoucementRouter.delete("/deleteAnnoucement/:id",deleteAnnoucement);
 
-annoucementRouter.post("/updateAnnoucement/:id",updateAnnoucement);
+annoucementRouter.put("/updateAnnoucement/:id",updateAnnoucement);
 
 export default annoucementRouter;

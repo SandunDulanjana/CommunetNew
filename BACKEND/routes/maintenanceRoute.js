@@ -7,7 +7,7 @@ const maintenanceRouter = express.Router()
 maintenanceRouter.post('/add-requestform',upload.single('images'),addForm)
 maintenanceRouter.get('/displayAllMaintainRequests',displayAllMaintainRequests)
 maintenanceRouter.get('/MaintainanceRequest/:id',MaintainanceRequest)
-maintenanceRouter.post('/UpdateMaintainanceRequest/:id',updateForm)
+maintenanceRouter.put('/UpdateMaintainanceRequest/:id',updateForm)
 maintenanceRouter.delete('/DeleteMaintainanceRequest/:id',deleteMaintenanceRequest)
 
 export default maintenanceRouter

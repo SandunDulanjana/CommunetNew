@@ -13,6 +13,6 @@ eventRouter.get('/single-event/:id',displaySingleEvent)
 
 eventRouter.delete('/delete-event/:id',deleteEvent)
 
-eventRouter.post('/update-event/:id',updateEvent)
+eventRouter.put('/update-event/:id',updateEvent)
 
 export default eventRouter;

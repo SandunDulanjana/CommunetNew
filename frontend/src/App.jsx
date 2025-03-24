@@ -46,6 +46,7 @@ function App() {
         <Route path='/FinaceCoPage' element = {<FinaceCoPage/>}></Route>
         <Route path='/MaintanCoPage' element = {<MaintanCoPage/>}></Route>
       </Routes>
+      
     </div>
   );
 }
