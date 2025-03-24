@@ -19,6 +19,7 @@ import ElectionCoPage from '../src/pages/ElectionCoPage';
 import EventCoPage from '../src/pages/EventCoPage';
 import FinaceCoPage from '../src/pages/FinaceCoPage';
 import MaintanCoPage from '../src/pages/MaintanCoPage';
+import AddEvent from './pages/AddEvent';
 
 
 
@@ -45,6 +46,8 @@ function App() {
         <Route path='/EventCoPage' element = {<EventCoPage/>}></Route>
         <Route path='/FinaceCoPage' element = {<FinaceCoPage/>}></Route>
         <Route path='/MaintanCoPage' element = {<MaintanCoPage/>}></Route>
+        <Route path='/AddEvent' element = {<AddEvent/>}></Route>
+      
       </Routes>
     </div>
   );
