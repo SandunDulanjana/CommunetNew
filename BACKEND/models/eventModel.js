@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 
 const eventSchema = new mongoose.Schema({
 
+        userId:{type:String, required: false},
         eventName : {type:String, required: true},
         organizarName : {type:String, required: true},
         discription : {type:String, required: true},

@@ -12,6 +12,7 @@ import Election  from '../src/pages/Election'
 import Event  from '../src/pages/Event'
 import MyEvents from '../src/pages/MyEvents'
 import MyMaintance from './pages/MyMaintance';
+import UpdateEvent from './pages/UpdateEvent';
 
 import AdminPage from '../src/pages/AdminPage';
 import CommuniCoPage from '../src/pages/CommuniCoPage';
@@ -58,7 +59,7 @@ function App() {
         <Route path="/success" element={<Success />} />
         <Route path='/expences' element={<Expences/>} />
         <Route path='/AddEvent' element = {<AddEvent/>}></Route>
-      
+        <Route path='/UpdateEvent' element = {<UpdateEvent/>}></Route>
       </Routes>
       
     </div>
