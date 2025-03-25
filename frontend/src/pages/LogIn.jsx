@@ -27,17 +27,17 @@ const LogIn = () => {
         password,
       });
   
-      console.log("Response Data:", response.data); // Log the full response
+      //console.log("Response Data:", response.data); 
   
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("email", response.data.email);
-        localStorage.setItem("userId", response.data.id); // Ensure ID is saved
+        localStorage.setItem("userId", response.data.id); 
         window.dispatchEvent(new Event("storage"));
   
-        console.log("User ID:", response.data.id);  // Check if ID is correct
+        console.log("User ID:", response.data.id);  
   
-        // Navigate based on ID
+       
         switch (response.data.id) {
           case "67e031c25758f1baf8765533":
             console.log("Navigating to ElectionCoPage");

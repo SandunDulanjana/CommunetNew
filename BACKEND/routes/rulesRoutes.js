@@ -9,6 +9,6 @@ rulesRouter.get("/displayrule",displayrules);
 
 rulesRouter.delete("/deleterules/:id",deleterules);
 
-rulesRouter.post("/updaterules/:id",updaterule);
+rulesRouter.put("/updaterules/:id",updaterule);
 
 export default rulesRouter;

@@ -106,11 +106,11 @@ const displayMember =  async(req,res) => {
 const updateMember = async (req, res) => {
     try {
         const memberId = req.params.id;
-        const { name, email, Password, houseNO, phoneNumber, bio, gender, NIC } = req.body;
+        const { name, email , houseNO, phoneNumber, bio, gender, NIC } = req.body;
         const imageFile = req.file;
 
         // Validate required fields
-        if (!name || !email || !Password || !houseNO || !phoneNumber || !bio || !gender || !NIC) {
+        if (!name || !email || !houseNO || !phoneNumber || !bio || !gender || !NIC) {
             return res.json({ success: false, message: "All fields are required" });
         }
 
@@ -118,15 +118,6 @@ const updateMember = async (req, res) => {
         if (!validator.isEmail(email)) {
             return res.json({ success: false, message: "Please enter a valid email" });
         }
-
-        // Validate password strength
-        if (Password.length < 8) {
-            return res.json({ success: false, message: "Please enter a strong password (min 8 characters)" });
-        }
-
-        // Hashing member password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(Password, salt);
 
         let imageUrl;
         if (imageFile) {
@@ -139,7 +130,6 @@ const updateMember = async (req, res) => {
         const updateData = {
             name,
             email,
-            Password: hashedPassword,
             houseNO,
             phoneNumber,
             bio,

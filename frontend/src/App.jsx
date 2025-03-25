@@ -49,6 +49,7 @@ function App() {
         <Route path='/AddEvent' element = {<AddEvent/>}></Route>
       
       </Routes>
+      
     </div>
   );
 }
