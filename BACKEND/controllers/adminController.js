@@ -2,6 +2,7 @@ import rulesModel from "../models/rulesModel.js";
 
 
 
+
 // insert
 
 const addrules = async(req,res)=>{
@@ -102,6 +103,8 @@ const updaterule = async(req,res)=>{
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+
 export{addrules,displayrules,deleterules,updaterule}
 
 

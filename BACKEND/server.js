@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import 'dotenv/config';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { config } from 'dotenv';
@@ -17,6 +18,8 @@ import eventRouter from '../BACKEND/routes/eventRoute.js';
 
 import annoucementRoute from '../BACKEND/routes/annoucemntRoute.js';
 import rulesRouter from '../BACKEND/routes/rulesRoutes.js';
+
+import expenseRouter from '../BACKEND/routes/expenseRouter.js'
 
 
 
@@ -40,10 +43,11 @@ app.use('/api/user',userRouter);
 app.use("/api/annoucement",annoucementRoute);
 app.use("/api/rules",rulesRouter);
 app.use('/api/event', eventRouter);
+app.use('/api/expense',expenseRouter)
 
 
 app.get('/',(req,res) => {
-    res.send('API WORKING '); 
+    res.send('API WORKING'); 
 })
 
 app.listen(port, ()=> console.log("Server started",port));

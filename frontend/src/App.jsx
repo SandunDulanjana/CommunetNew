@@ -22,6 +22,11 @@ import MaintanCoPage from '../src/pages/MaintanCoPage';
 import AddEvent from './pages/AddEvent';
 
 
+import BuyPlans from './pages/BuyPlans';
+import Checkout from './pages/CheckOut';
+import Payment from "./pages/Payment";
+import Success from "./pages/Success";
+import Expences from './pages/Expences'
 
 
 function App() {
@@ -46,6 +51,12 @@ function App() {
         <Route path='/EventCoPage' element = {<EventCoPage/>}></Route>
         <Route path='/FinaceCoPage' element = {<FinaceCoPage/>}></Route>
         <Route path='/MaintanCoPage' element = {<MaintanCoPage/>}></Route>
+
+        <Route path='/buy' element={<BuyPlans/>}></Route>
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/payment" element={<Payment />} />
+        <Route path="/success" element={<Success />} />
+        <Route path='/expences' element={<Expences/>} />
         <Route path='/AddEvent' element = {<AddEvent/>}></Route>
       
       </Routes>
