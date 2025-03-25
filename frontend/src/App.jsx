@@ -28,6 +28,7 @@ import Checkout from './pages/CheckOut';
 import Payment from "./pages/Payment";
 import Success from "./pages/Success";
 import Expences from './pages/Expences'
+import FinanceHome from './pages/FinanceHome';
 
 
 function App() {
@@ -58,6 +59,8 @@ function App() {
         <Route path="/payment" element={<Payment />} />
         <Route path="/success" element={<Success />} />
         <Route path='/expences' element={<Expences/>} />
+        <Route path='/financeHome' element={<FinanceHome/>} />
+
         <Route path='/AddEvent' element = {<AddEvent/>}></Route>
         <Route path='/UpdateEvent' element = {<UpdateEvent/>}></Route>
       </Routes>
