@@ -11,10 +11,9 @@ function MaintanCoPage() {
     const fetchMaintenance = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/maintenance/displayAllMaintainRequests`);
-        console.log('response:', response);
         console.log('response data:', response.data);
         // Check if response data contains MaintainanceRequest and set it, else set empty array
-        setRequests(response.data.MaintainanceRequest || []);
+        setRequests(response.data.AllMaintainanceRequests || []);
         setIsLoading(false); // Set loading to false once data is fetched
       } catch (error) {
         console.error('Error fetching maintenance:', error);
