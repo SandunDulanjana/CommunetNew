@@ -12,7 +12,7 @@ const MyMaintance = () => {
   useEffect(() => {
     const fetchMaintenance = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/maintenance/MaintainanceRequest/67e29c883eb08c3ea25e5484`);
+        const response = await axios.get(`http://localhost:5000/api/maintenance/MaintainanceRequest/67e391e04676d10d769480f9`);
         console.log('response:', response);
         console.log('response data:', response.data);
         setMaintenance(response.data.MaintainanceRequest);
@@ -33,7 +33,7 @@ const MyMaintance = () => {
     try {
       const confirmDelete = window.confirm('Are you sure you want to delete this maintenance request?');
       if (confirmDelete) {
-        await axios.delete(`http://localhost:5000/api/maintenance/MaintainanceRequest/${id}`);
+        await axios.delete(`http://localhost:5000/api/maintenance/DeleteMaintainanceRequest/${id}`);
         alert('Maintenance request deleted successfully');
         navigate('/'); // Redirect to the home page or the list of requests
       }

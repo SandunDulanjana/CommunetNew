@@ -54,9 +54,9 @@ function MaintanCoPage() {
             <p><strong>Full Name:</strong> {request.name}</p>
             <p><strong>Phone Number:</strong> {request.phone}</p>
             <p><strong>Email Address:</strong> {request.email}</p>
-            <p><strong>House Number:</strong> {request.house}</p>
-            <p><strong>Issue Type:</strong> {request.issueType}</p>
-            <p><strong>Description:</strong> {request.description}</p>
+            <p><strong>House Number:</strong> {request.houseNo}</p>
+            <p><strong>Issue Type:</strong> {request.category}</p>
+            <p><strong>Description:</strong> {request.details}</p>
             <p><strong>Priority:</strong> {request.priority}</p>
             <div className="flex space-x-4 mt-4">
               <button
