@@ -29,6 +29,8 @@ import Payment from "./pages/Payment";
 import Success from "./pages/Success";
 import Expences from './pages/Expences'
 import FinanceHome from './pages/FinanceHome';
+import AnnouncementPage from './pages/AnnouncementPage';
+
 
 
 function App() {
@@ -63,6 +65,8 @@ function App() {
 
         <Route path='/AddEvent' element = {<AddEvent/>}></Route>
         <Route path='/UpdateEvent' element = {<UpdateEvent/>}></Route>
+
+        <Route path="/AnnouncementPage" element={<AnnouncementPage />} />
       </Routes>
       
     </div>

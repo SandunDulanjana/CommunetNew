@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const AddAnnouncementPage = () => {
+const AnnouncementPage = () => {
     const [announcement, setAnnouncement] = useState({
         Type: "",
         description: "",
@@ -85,4 +85,4 @@ const AddAnnouncementPage = () => {
     );
 };
 
-export default AddAnnouncementPage;
+export default AnnouncementPage;
