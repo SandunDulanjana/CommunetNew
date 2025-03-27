@@ -14,6 +14,7 @@ import MyEvents from '../src/pages/MyEvents'
 import MyMaintance from './pages/MyMaintance';
 import UpdateEvent from './pages/UpdateEvent';
 
+
 import AdminPage from '../src/pages/AdminPage';
 import CommuniCoPage from '../src/pages/CommuniCoPage';
 import ElectionCoPage from '../src/pages/ElectionCoPage';
@@ -28,7 +29,10 @@ import AddElection from '../src/pages/AddElection'
 import BuyPlans from './pages/BuyPlans';
 import Checkout from './pages/CheckOut';
 import Payment from "./pages/Payment";
-import Success from "./pages/Success";
+
+import Expences from './pages/Expences';
+import QR from './pages/QR';
+
 import Expences from './pages/Expences'
 import AddMaintenance from './pages/AddMaintenance';
 import EditMaintenance from './pages/EditMaintenance';
@@ -66,6 +70,10 @@ function App() {
         <Route path='/financeHome' element={<FinanceHome/>} />
 
         <Route path='/AddEvent' element = {<AddEvent/>}></Route>
+
+        <Route path='/UpdateEvent/:id' element = {<UpdateEvent/>}></Route>
+        <Route path='/qr/:id' element = {<QR/>}></Route>
+
         <Route path='/UpdateEvent' element = {<UpdateEvent/>}></Route>
         <Route path='/EditElection/:id' element = {<EditElection/>}></Route>
         <Route path='/addElection' element = {<AddElection/>}></Route>

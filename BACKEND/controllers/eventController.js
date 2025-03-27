@@ -2,14 +2,17 @@
 import validator from 'validator';
 import eventModel from '../models/eventModel.js';
 
+
 //API for add user data
 const addEvent = async(req,res) => {
     try{
-        const {eventName,organizarName,discription,date,time,venue,organizarContactNo,organizarEmail,expectedCount} = req.body
+        const {eventName,organizarName,discription,date,time,venue,organizarContactNo,organizarEmail,expectedCount,requestType} = req.body
         
-        if(!eventName || !organizarName || !discription || !date || !time || !venue || !organizarContactNo || !organizarEmail || !expectedCount){
+        if(!eventName || !organizarName || !discription || !date || !time || !venue || !organizarContactNo || !organizarEmail || !expectedCount || !requestType){
            return res.json({success:false, message: "All fields are required"});
         }
+        if(!(organizarContactNo.length === 10)){
+            return res.json({success:false, message: "Contact number is too long"});}
 
         if(!validator.isEmail(organizarEmail)){
             return res.json({success:false, message: "Please enter valid email"});
@@ -28,7 +31,8 @@ const addEvent = async(req,res) => {
             venue,
             organizarContactNo,
             organizarEmail,
-            expectedCount
+            expectedCount,
+            requestType
         }
         const newEvent = new eventModel(eventData);
         await newEvent.save();
@@ -89,9 +93,9 @@ const updateEvent = async (req,res) => {
     try{
         const eventId = req.params.id;
 
-        const {eventName,organizarName,discription,date,time,venue,organizarContactNo,organizarEmail,expectedCount} = req.body
+        const {eventName,organizarName,discription,date,time,venue,organizarContactNo,organizarEmail,expectedCount,requestType} = req.body
         
-        if(!eventName || !organizarName || !discription || !date || !time || !venue || !organizarContactNo || !organizarEmail || !expectedCount){
+        if(!eventName || !organizarName || !discription || !date || !time || !venue || !organizarContactNo || !organizarEmail || !expectedCount || !requestType){
            return res.json({success:false, message: "All fields are required"});
         }
 
@@ -103,7 +107,7 @@ const updateEvent = async (req,res) => {
             return res.json({success:false, message: "Discriptin length is too long"});
         }
 
-        await eventModel.findByIdAndUpdate(eventId, {$set: {eventName,organizarName,discription,date,time,venue,organizarContactNo,organizarEmail,expectedCount}})
+        await eventModel.findByIdAndUpdate(eventId, {$set: {eventName,organizarName,discription,date,time,venue,organizarContactNo,organizarEmail,expectedCount,requestType}})
         res.json({success: true, message: "Event updadet successfully."})
 
     }catch(error){

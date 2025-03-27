@@ -10,7 +10,7 @@ const MyEvents = () => {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/event/single-event/67d2c4062c5651aacd300548');
+        const response = await axios.get('http://localhost:5000/api/event/single-event/67e335e3a98233634496d859');
         console.log('response:', response);
         console.log('response data:', response.data);
         setEvent(response.data.event);
@@ -27,10 +27,10 @@ const MyEvents = () => {
   }
 
   return (
-
     <div>
- 
+
       My MyEvents
+
       <div className="flex flex-col min-h-screen p-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Event Details</h1>
@@ -55,6 +55,10 @@ const MyEvents = () => {
                 <th className="p-2 border">Contact No</th>
                 <th className="p-2 border">Email</th>
                 <th className="p-2 border">Expected Count</th>
+
+                <th className="p-2 border">Request Type</th>
+                <th className="p-2 border">Actions</th>
+
               </tr>
             </thead>
             <tbody>
@@ -68,15 +72,31 @@ const MyEvents = () => {
                 <td className="p-2 border">{event.organizarContactNo}</td>
                 <td className="p-2 border">{event.organizarEmail}</td>
                 <td className="p-2 border">{event.expectedCount}</td>
+
+                <td className="p-2 border">{event.requestType}</td>
+                <td className="p-2 border">
+                  <button
+                    onClick={() => navigate(`/UpdateEvent/${event._id}`)}
+                    className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600 transition"
+                  >
+                    Edit
+                  </button>
+                </td>
+
               </tr>
             </tbody>
           </table>
         </div>
 
+        <Footer />
+      </div>
+
 
       </div>
       <Footer />
+
       </div>
+
     </div>
   );
 };

@@ -13,6 +13,7 @@ const eventSchema = new mongoose.Schema({
         organizarContactNo : {type:String, required: true},
         organizarEmail : {type:String, required: true},
         expectedCount : {type:Number, required: true},
+        requestType : {type:String, required: true},
         status : {type:String, required: false},
 
 })
