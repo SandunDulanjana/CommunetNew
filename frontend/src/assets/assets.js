@@ -1,9 +1,15 @@
 import logo_icon from './logo_icon.svg'
+import group_profiles from './group_profiles.png'
+import arrow_icon from './arrow_icon.svg'
+import header_img from './header_img.jpg'
 
 
 
 export const assets = {
-    logo_icon
+    logo_icon,
+    group_profiles,
+    arrow_icon,
+    header_img
 }
 
 export const plans = [

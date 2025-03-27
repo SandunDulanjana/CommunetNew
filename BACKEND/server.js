@@ -34,6 +34,13 @@ app.use('/api/addmaintenace', maintenanceRoute);
 app.use('/api/user', userRouter);
 app.use('/api/annoucement', annoucementRoute);
 app.use('/api/rules', rulesRouter);
+
+app.use('/api/member',memberRouter);
+app.use('/api/maintenance', maintenanceRoute)
+app.use('/api/user',userRouter);
+app.use("/api/annoucement",annoucementRoute);
+app.use("/api/rules",rulesRouter);
+
 app.use('/api/event', eventRouter);
 app.use('/api/expense', expenseRouter);
 
