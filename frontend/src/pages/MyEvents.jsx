@@ -95,6 +95,8 @@ const MyEvents = () => {
       </div>
       <Footer />
 
+      </div>
+
     </div>
   );
 };

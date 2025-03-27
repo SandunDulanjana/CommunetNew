@@ -22,6 +22,8 @@ import EventCoPage from '../src/pages/EventCoPage';
 import FinaceCoPage from '../src/pages/FinaceCoPage';
 import MaintanCoPage from '../src/pages/MaintanCoPage';
 import AddEvent from './pages/AddEvent';
+import EditElection from '../src/pages/EditElection'
+import AddElection from '../src/pages/AddElection'
 
 
 import BuyPlans from './pages/BuyPlans';
@@ -73,6 +75,8 @@ function App() {
         <Route path='/qr/:id' element = {<QR/>}></Route>
 
         <Route path='/UpdateEvent' element = {<UpdateEvent/>}></Route>
+        <Route path='/EditElection/:id' element = {<EditElection/>}></Route>
+        <Route path='/addElection' element = {<AddElection/>}></Route>
         <Route path='/AddMaintenance' element = {<AddMaintenance/>}></Route>
         <Route path='/EditMaintenance/:id' element = {<EditMaintenance/>}></Route>
       </Routes>
