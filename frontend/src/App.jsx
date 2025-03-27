@@ -28,6 +28,8 @@ import Checkout from './pages/CheckOut';
 import Payment from "./pages/Payment";
 import Success from "./pages/Success";
 import Expences from './pages/Expences'
+import AddMaintenance from './pages/AddMaintenance';
+import EditMaintenance from './pages/EditMaintenance';
 import FinanceHome from './pages/FinanceHome';
 
 
@@ -63,6 +65,8 @@ function App() {
 
         <Route path='/AddEvent' element = {<AddEvent/>}></Route>
         <Route path='/UpdateEvent' element = {<UpdateEvent/>}></Route>
+        <Route path='/AddMaintenance' element = {<AddMaintenance/>}></Route>
+        <Route path='/EditMaintenance/:id' element = {<EditMaintenance/>}></Route>
       </Routes>
       
     </div>

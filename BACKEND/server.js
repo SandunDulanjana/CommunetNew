@@ -38,7 +38,7 @@ app.use(express.json());
 
 //api endpoints
 app.use('/api/member',memberRouter);
-app.use('/api/addmaintenace', maintenanceRoute)
+app.use('/api/maintenance', maintenanceRoute)
 app.use('/api/user',userRouter);
 app.use("/api/annoucement",annoucementRoute);
 app.use("/api/rules",rulesRouter);
