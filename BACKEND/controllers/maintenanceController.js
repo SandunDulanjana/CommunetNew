@@ -6,35 +6,29 @@ const addForm = async (req, res) => {
     try {
         const { name, phone, email, houseNo, category, details, priority } = req.body;
         const imageFile = req.file;
-       
 
-        // Check for missing fields
         if (!name || !phone || !email || !houseNo || !category || !details || !priority) {
-            return res.status(400).json({ success: false, message: "Missing details" });
+            return res.status(400).json({ success: false, message: "Missing required fields" });
         }
 
-        // Validate email
         if (!validator.isEmail(email)) {
-            return res.status(400).json({ success: false, message: "Please enter a valid email" });
+            return res.status(400).json({ success: false, message: "Invalid email address" });
         }
 
-        // Validate phone number (basic example for 10 digits)
         const phoneRegex = /^\d{10}$/;
         if (!phoneRegex.test(phone)) {
-            return res.status(400).json({ success: false, message: "Please enter a valid phone number" });
+            return res.status(400).json({ success: false, message: "Invalid phone number" });
         }
 
-        // Handle image upload (if provided)
         let imageUrl = null;
         if (imageFile) {
             const uploadResponse = await cloudinary.uploader.upload(imageFile.path, {
-                folder: "requestForms",
+                folder: "maintenance_requests",
             });
             imageUrl = uploadResponse.secure_url;
         }
 
-        // Create form data
-        const formData = {
+        const newRequest = new maintenanceModel({
             name,
             phone,
             email,
@@ -44,39 +38,38 @@ const addForm = async (req, res) => {
             priority,
             images: imageUrl,
             date: Date.now(),
-        };
+        });
 
-        // Save to the database
-        const newRequest = new maintenanceModel(formData);
         await newRequest.save();
 
         res.status(201).json({ success: true, message: "Request added successfully" });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
 
-const displayAllMaintainRequests =  async(req,res) => {
-    try{
+
+const displayAllMaintainRequests = async (req, res) => {
+    try {
         const AllMaintainanceRequests = await maintenanceModel.find()
         return res.status(200).json({ success: true, AllMaintainanceRequests });
 
-    }catch(error){
+    } catch (error) {
         console.log(error);
-        res.json({success:false, message: error.message});
+        res.json({ success: false, message: error.message });
     }
 }
 
-const MaintainanceRequest =  async(req,res) => {
-    try{
+const MaintainanceRequest = async (req, res) => {
+    try {
         const maintenanceId = req.params.id;
         const MaintainanceRequest = await maintenanceModel.findById(maintenanceId)
         return res.status(200).json({ success: true, MaintainanceRequest });
 
-    }catch(error){
+    } catch (error) {
         console.log(error);
-        res.json({success:false, message: error.message});
+        res.json({ success: false, message: error.message });
     }
 }
 
@@ -84,39 +77,37 @@ const MaintainanceRequest =  async(req,res) => {
 const updateForm = async (req, res) => {
     try {
         const maintenanceId = req.params.id;
+
+        // Log received data
+        console.log('Body:', req.body);
+        console.log('Files:', req.files);
+
         const { name, phone, email, houseNo, category, details, priority } = req.body;
-        const imageFile = req.file;
 
-        console.log(name)
-       
-
-        // Check for missing fields
+        // Validate required fields
         if (!name || !phone || !email || !houseNo || !category || !details || !priority) {
-            return res.status(400).json({ success: false, message: "Missing details" });
+            return res.status(400).json({ success: false, message: 'Cannot update, Missing required fields' });
         }
 
-        // Validate email
-        if (!validator.isEmail(email)) {
-            return res.status(400).json({ success: false, message: "Please enter a valid email" });
+        // Handle image upload
+        let imageUrls = [];
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                const uploadResponse = await cloudinary.uploader.upload(file.path, {
+                    folder: 'maintenance_requests',
+                });
+                imageUrls.push(uploadResponse.secure_url);
+            }
         }
 
-        // Validate phone number (basic example for 10 digits)
+        // Validate phone number
         const phoneRegex = /^\d{10}$/;
         if (!phoneRegex.test(phone)) {
-            return res.status(400).json({ success: false, message: "Please enter a valid phone number" });
+            return res.status(400).json({ success: false, message: "Invalid phone number" });
         }
 
-        // Handle image upload (if provided)
-        let imageUrl = null;
-        if (imageFile) {
-            const uploadResponse = await cloudinary.uploader.upload(imageFile.path, {
-                folder: "requestForms",
-            });
-            imageUrl = uploadResponse.secure_url;
-        }
 
-        // update form data
-        const UpdatedformData = {
+        const updatedData = {
             name,
             phone,
             email,
@@ -124,31 +115,30 @@ const updateForm = async (req, res) => {
             category,
             details,
             priority,
-            images: imageUrl,
-            date: Date.now(),
+            images: imageUrls.length ? imageUrls : undefined,
         };
 
-        // Save to the database
-        await maintenanceModel.findByIdAndUpdate(maintenanceId, { $set: UpdatedformData });
+        // Update the maintenance request
+        await maintenanceModel.findByIdAndUpdate(maintenanceId, updatedData, { new: true });
 
-        return res.json({ success: true, message: "Maintenance details updated successfully" });
-
-
+        return res.status(200).json({ success: true, message: 'Maintenance details updated successfully' });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
+        console.error('Error in updateForm:', error.message);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 };
 
-const deleteMaintenanceRequest = async(req,res) => {
 
-    try{
+
+const deleteMaintenanceRequest = async (req, res) => {
+
+    try {
         const maintenanceId = req.params.id;
         await maintenanceModel.findByIdAndDelete(maintenanceId)
         return res.json({ success: true, message: "Maintenance request deleted successfully" });
 
-    }catch(error){
-        return res.json({success:false, massage:error.massage})
+    } catch (error) {
+        return res.json({ success: false, massage: error.massage })
     }
 }
-export { addForm , displayAllMaintainRequests ,MaintainanceRequest , updateForm , deleteMaintenanceRequest };
+export { addForm, displayAllMaintainRequests, MaintainanceRequest, updateForm, deleteMaintenanceRequest };

@@ -32,3 +32,6 @@ build/
 # OS-specific files
 .DS_Store
 Thumbs.db
+
+# file uploads
+uploads/
