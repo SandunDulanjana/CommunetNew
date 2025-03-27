@@ -1,110 +1,87 @@
-import annouceModel from"../models/annoucementModel.js";
+import announcementModel from "../models/announcementModel.js"; // Fixed typo
 
-// insert
-
-const addannoucemnt = async(req,res)=>{
-
-    try{
-
-        const {Type,discription,audience}=req.body;
-
-        if(!Type||!discription||!audience){
-
-            return res.json({success:false,message:"missing details"});
-        }
-
-        const annoucementData={
-
-            Type,
-            discription,
-            date:Date.now(),
-            audience
-        }
-
-        const newannoucement= new annouceModel(annoucementData);
-        await  newannoucement.save();
-        
-        res.json ({success:true,message:"Add Annoucement Sucessfuly "});
-
-
-
-
-
-    }catch(error){
-
-        console.log(error);
-        res.json({success:false,message:error.message});
-
-
-    };
-    
-    
-}
-// read
-const displayAllAnnoucemnts =  async(req,res) => {
-    try{
-        const AllAnnoucemnts = await annouceModel.find()
-        return res.status(200).json({ success: true, AllAnnoucemnts });
-
-    }catch(error){
-        console.log(error);
-        res.json({success:false, message: error.message});
-    }
-}
-
-const displayAnnoucemnt = async (req, res) => {
+// Insert
+export const addAnnouncement = async (req, res) => {
     try {
-        const AnnoucemntAudience = req.params.audience;
-        const Annoucemnt = await annouceModel.find({ audience: AnnoucemntAudience });
+        const { Type, description, audience } = req.body;
 
-        return res.status(200).json({ success: true, Annoucemnt });
+        if (!Type || !description || !audience) {
+            return res.status(400).json({ success: false, message: "Missing details" }); // Added status code
+        }
+
+        const announcementData = {
+            Type,
+            description,
+            date: Date.now(),
+            audience,
+        };
+
+        const newAnnouncement = new announcementModel(announcementData); // Fixed typo
+        await newAnnouncement.save();
+
+        res.status(201).json({ success: true, message: "Announcement added successfully" }); // Added status code
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: error.message }); // Added status code
+    }
+};
+
+// Read all announcements
+export const displayAllAnnouncements = async (req, res) => {
+    try {
+        const allAnnouncements = await announcementModel.find(); // Fixed typo
+        return res.status(200).json({ success: true, allAnnouncements });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: error.message }); // Added status code
+    }
+};
+
+// Read a specific announcement
+export const displayAnnouncement = async (req, res) => {
+    try {
+        const announcementAudience = req.params.audience;
+        const announcement = await announcementModel.find({ audience: announcementAudience }); // Fixed typo
+
+        return res.status(200).json({ success: true, announcement });
     } catch (error) {
         console.log(error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-const deleteAnnoucement=async(req,res)=>{
-    try{
+// Delete announcement
+export const deleteAnnouncement = async (req, res) => {
+    try {
+        const announcementId = req.params.id;
 
-    const annoucementId=req.params.id;
-         
-    await annouceModel.findByIdAndDelete(annoucementId);
+        await announcementModel.findByIdAndDelete(announcementId); // Fixed typo
 
-    return res.json({success: true, message:"Annoucement Delete"})
-
-
-    }catch (error) {
-        console.log(error);
-        res.status(500).json({ success: false, message: error.message });
-    }
-
-
-}
-
-
-const updateAnnoucement=async(req,res)=>{
-
-    try{
-
-        const annoucementId= req.params.id;
-
-        const {Type,discription,audience}=req.body;
-
-        if(!Type||!discription||!audience){
-
-            return res.json({success:false,message:"missing details"});
-        }
-        await annouceModel.findByIdAndUpdate(annoucementId,{$set:{Type,discription,audience}})
-        res.json({success: true, message:"Annoucement Update Success"})
-
-
-
-
-    }catch(error){
-
+        return res.status(200).json({ success: true, message: "Announcement deleted" }); // Added status code
+    } catch (error) {
         console.log(error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
-export{addannoucemnt,displayAllAnnoucemnts,displayAnnoucemnt,deleteAnnoucement,updateAnnoucement}
+
+// Update announcement
+export const updateAnnouncement = async (req, res) => {
+    try {
+        const announcementId = req.params.id;
+
+        const { Type, description, audience } = req.body;
+
+        if (!Type || !description || !audience) {
+            return res.status(400).json({ success: false, message: "Missing details" }); // Added status code
+        }
+
+        await announcementModel.findByIdAndUpdate(announcementId, { // Fixed typo
+            $set: { Type, description, audience },
+        });
+
+        res.status(200).json({ success: true, message: "Announcement updated successfully" }); // Added status code
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};

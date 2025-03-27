@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
+
 
 const AnnouncementPage = () => {
     const [announcement, setAnnouncement] = useState({
@@ -14,15 +16,26 @@ const AnnouncementPage = () => {
         setAnnouncement({ ...announcement, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         alert(
             `Type: ${announcement.Type}\nDescription: ${announcement.description}\nDate: ${announcement.date}\nAudience: ${announcement.audience}`
         );
-        setAnnouncement({ Type: "", description: "", date: "", audience: "" });
-        // Navigate to the "/displayAllPage" after the form is submitted
-        navigate("/DisplayAllPage");
+    
+        try {
+            const { data } = await axios.post(
+                `http://localhost:5000/api/addannoucemnt`,
+                announcement,
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+            console.log('Response:', data);
+            setAnnouncement({ Type: "", description: "", date: "", audience: "" });
+            navigate("/DisplayAllPage");
+        } catch (error) {
+            console.error("Error submitting announcement:", error);
+        }
     };
+    
 
     return (
         <div className="max-w-lg mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">

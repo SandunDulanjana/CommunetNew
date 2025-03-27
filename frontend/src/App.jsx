@@ -30,6 +30,9 @@ import Success from "./pages/Success";
 import Expences from './pages/Expences'
 import FinanceHome from './pages/FinanceHome';
 import AnnouncementPage from './pages/AnnouncementPage';
+import DisplayAllPage from './pages/DisplayAllPage';
+
+
 
 
 
@@ -67,6 +70,7 @@ function App() {
         <Route path='/UpdateEvent' element = {<UpdateEvent/>}></Route>
 
         <Route path="/AnnouncementPage" element={<AnnouncementPage />} />
+        <Route path="/DisplayAllPage" element={<DisplayAllPage />} />
       </Routes>
       
     </div>
