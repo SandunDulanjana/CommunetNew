@@ -1,179 +1,30 @@
+// AddElection.jsx
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { useState,React } from 'react';
-import axios from 'axios';
-import Footer from '../componenets/Footer'
+const AddElection = () => {
+  const [question, setQuestion] = useState("");
+  const navigate = useNavigate();
 
-const addEvent = () => {
-    const [eventName, setEventName] = useState('');
-    const [organizarName, setOrganizarName] = useState('');
-    const [discription, setDescription] = useState('');
-    const [date, setDate] = useState('');
-    const [time, setStartTime] = useState('');
-    const [venue, setVenue] = useState('');
-    const [organizarContactNo, setOrganizarContactNo] = useState('');
-    const [organizarEmail, setOrganizarEmail] = useState('');
-    const [expectedCount, setExpectedCount] = useState(0);
-
-    const onSubmitHandler = async (e) => {
-        e.preventDefault();
-
-        try {
-            const formData = {
-                eventName,
-                organizarName,
-                discription,
-                date,
-                time,
-                venue,
-                organizarContactNo,
-                organizarEmail,
-                expectedCount
-            };
-
-            console.log("Form data being sent:", formData);
-
-            const { data } = await axios.post('http://localhost:5000/api/event/add-event', formData);
-
-            if (data.success) {
-                console.log("Event added successfully");
-            } else {
-                console.error("Failed to add event: ", data.message);
-            }
-        } catch (error) {
-            console.error("Error submitting form:", error);
-        }
-    };
+  const addPoll = async (e) => {
+    e.preventDefault();
+    await fetch("/api/polls", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question })
+    });
+    navigate("/");
+  };
 
   return (
-    <div>
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-            <form onSubmit={onSubmitHandler} className="bg-white shadow-lg rounded-lg p-8 max-w-lg w-full">
-                <h1 className="text-3xl font-bold mb-8 text-center">Create a New Event</h1>
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Add New Poll</h2>
+      <form onSubmit={addPoll}>
+        <input type="text" value={question} onChange={(e) => setQuestion(e.target.value)} className="border p-2 w-full mb-2" placeholder="Enter poll question" required />
+        <button type="submit" className="bg-green-500 text-white p-2 rounded">Create Poll</button>
+      </form>
+    </div>
+  );
+};
 
-                <label className="block mb-4">
-                    <span className="text-gray-700">Event Name:</span>
-                    <input
-                        name="eventName"
-                        type="text"
-                        onChange={(e) => setEventName(e.target.value)}
-                        value={eventName}
-                        required
-                        placeholder="Enter event name"
-                        className="mt-1 p-2 w-full border rounded-md"
-                    />
-                </label>
-
-                <label className="block mb-4">
-                    <span className="text-gray-700">Organizer Name:</span>
-                    <input
-                        name="organizarName"
-                        type="text"
-                        onChange={(e) => setOrganizarName(e.target.value)}
-                        value={organizarName}
-                        required
-                        placeholder="Enter organizer name"
-                        className="mt-1 p-2 w-full border rounded-md"
-                    />
-                </label>
-
-                <label className="block mb-4">
-                    <span className="text-gray-700">Description:</span>
-                    <textarea
-                        name="discription"
-                        type="text"
-                        onChange={(e) => setDescription(e.target.value)}
-                        value={discription}
-                        required
-                        placeholder="Enter event description"
-                        className="mt-1 p-2 w-full border rounded-md"
-                    ></textarea>
-                </label>
-
-                <label className="block mb-4">
-                    <span className="text-gray-700">Date:</span>
-                    <input
-                        name="date"
-                        type="date"
-                        onChange={(e) => setDate(e.target.value)}
-                        value={date}
-                        required
-                        className="mt-1 p-2 w-full border rounded-md"
-                    />
-                </label>
-
-                <label className="block mb-4">
-                    <span className="text-gray-700">Start Time:</span>
-                    <input
-                        name="time"
-                        type="time"
-                        onChange={(e) => setStartTime(e.target.value)}
-                        value={time}
-                        required
-                        placeholder="Enter event start time"
-                        className="mt-1 p-2 w-full border rounded-md"
-                    />
-                
-                </label>
-
-                <label className="block mb-4">
-                    <span className="text-gray-700">Venue:</span>
-                    <input
-                        name="venue"
-                        type="text"
-                        onChange={(e) => setVenue(e.target.value)}
-                        value={venue}
-                        required
-                        placeholder="Enter event venue"
-                        className="mt-1 p-2 w-full border rounded-md"
-                    />
-                </label>
-
-                <label className="block mb-4">
-                    <span className="text-gray-700">Organizer Contact Number:</span>
-                    <input
-                        name="organizarContactNo"
-                        type="text"
-                        onChange={(e) => setOrganizarContactNo(e.target.value)}
-                        value={organizarContactNo}
-                        required
-                        placeholder="Enter contact number"
-                        className="mt-1 p-2 w-full border rounded-md"
-                    />
-                </label>
-
-                <label className="block mb-4">
-                    <span className="text-gray-700">Organizer Email:</span>
-                    <input
-                        name="organizarEmail"
-                        type="email"
-                        onChange={(e) => setOrganizarEmail(e.target.value)}
-                        value={organizarEmail}
-                        required
-                        placeholder="Enter organizer email"
-                        className="mt-1 p-2 w-full border rounded-md"
-                    />
-                </label>
-
-                <label className="block mb-6">
-                    <span className="text-gray-700">Expected Count:</span>
-                    <input
-                        name="expectedCount"
-                        type="number"
-                        onChange={(e) => setExpectedCount(Number(e.target.value))}
-                        value={expectedCount}
-                        min="0"
-                        required
-                        placeholder="Enter expected attendees"
-                        className="mt-1 p-2 w-full border rounded-md"
-                    />
-                </label>
-
-                <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded-lg w-full hover:bg-blue-700">Submit</button>
-            </form>
-        </div>
-        <Footer />
-      </div>
-  )
-}
-
-export default addEvent
+export default AddElection;
