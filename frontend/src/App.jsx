@@ -14,6 +14,7 @@ import MyEvents from '../src/pages/MyEvents'
 import MyMaintance from './pages/MyMaintance';
 import UpdateEvent from './pages/UpdateEvent';
 
+
 import AdminPage from '../src/pages/AdminPage';
 import CommuniCoPage from '../src/pages/CommuniCoPage';
 import ElectionCoPage from '../src/pages/ElectionCoPage';
@@ -27,7 +28,8 @@ import BuyPlans from './pages/BuyPlans';
 import Checkout from './pages/CheckOut';
 import Payment from "./pages/Payment";
 import Success from "./pages/Success";
-import Expences from './pages/Expences'
+import Expences from './pages/Expences';
+import QR from './pages/QR';
 
 
 function App() {
@@ -59,7 +61,8 @@ function App() {
         <Route path="/success" element={<Success />} />
         <Route path='/expences' element={<Expences/>} />
         <Route path='/AddEvent' element = {<AddEvent/>}></Route>
-        <Route path='/UpdateEvent' element = {<UpdateEvent/>}></Route>
+        <Route path='/UpdateEvent/:id' element = {<UpdateEvent/>}></Route>
+        <Route path='/qr/:id' element = {<QR/>}></Route>
       </Routes>
       
     </div>

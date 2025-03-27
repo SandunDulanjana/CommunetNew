@@ -7,7 +7,7 @@ const MyEvents = () => {
   const navigate = useNavigate();
   const [event, setEvent] = useState({});
   const [isEdit, setIsEdit] = useState(false);
-  const eventId = '67d2c4062c5651aacd300548';
+  const eventId = '67e335e3a98233634496d859';
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -70,6 +70,7 @@ const MyEvents = () => {
               <th className="p-2 border">Contact No</th>
               <th className="p-2 border">Email</th>
               <th className="p-2 border">Expected Count</th>
+              <th className="p-2 border">Request Type</th> 
               <th className="p-2 border">Actions</th>
             </tr>
           </thead>
@@ -103,6 +104,21 @@ const MyEvents = () => {
               <td className="p-2 border">{event?.organizerContactNo || 'N/A'}</td>
               <td className="p-2 border">{event?.organizerEmail || 'N/A'}</td>
               <td className="p-2 border">{event?.expectedCount || 'N/A'}</td>
+              <td className="p-2 border">
+                {isEdit ? (
+                  <select
+                    value={event?.requestType || ''}
+                    onChange={(e) => setEvent({ ...event, requestType: e.target.value })}
+                    className="p-2 w-full border rounded-md"
+                  >
+                    <option value="">Select a request type</option>
+                    <option value="Request to Join">Request to Join</option>
+                    <option value="All In">All In</option>
+                  </select>
+                ) : (
+                  event.requestType || 'N/A'
+                )}
+              </td>
               <td className="p-2 border">
                 {isEdit ? (
                   <button onClick={updateEvent} className="bg-green-500 text-white px-4 py-1 rounded-lg mr-2">
