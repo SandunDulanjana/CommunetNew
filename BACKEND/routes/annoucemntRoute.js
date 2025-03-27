@@ -4,9 +4,9 @@ import express from"express";
 const annoucementRouter=express.Router();
 annoucementRouter.post("/addannoucemnt",addannoucemnt);
 
-annoucementRouter.get('/annoucements', displayAllAnnoucemnts);
+annoucementRouter.get("/annoucements", displayAllAnnoucemnts);
 
-annoucementRouter.get('/displayAnnoucemnt/:audience', displayAnnoucemnt);
+annoucementRouter.get("/displayAnnoucemnt/:audience", displayAnnoucemnt);
 
 annoucementRouter.delete("/deleteAnnoucement/:id",deleteAnnoucement);
 

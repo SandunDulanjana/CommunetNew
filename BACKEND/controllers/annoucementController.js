@@ -108,4 +108,3 @@ const updateAnnoucement=async(req,res)=>{
     }
 };
 export{addannoucemnt,displayAllAnnoucemnts,displayAnnoucemnt,deleteAnnoucement,updateAnnoucement}
-

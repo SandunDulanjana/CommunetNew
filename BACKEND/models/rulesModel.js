@@ -11,4 +11,3 @@ const rulesSchema= new mongoose.Schema({
 })
 const rulesModel= mongoose.model.raiseticket || mongoose.model('rules',rulesSchema);
 export default rulesModel;
-

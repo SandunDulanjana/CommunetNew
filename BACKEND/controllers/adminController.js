@@ -106,7 +106,3 @@ const updaterule = async(req,res)=>{
 
 
 export{addrules,displayrules,deleterules,updaterule}
-
-
-
-
