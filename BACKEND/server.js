@@ -20,6 +20,7 @@ import annoucementRoute from '../BACKEND/routes/annoucemntRoute.js';
 import rulesRouter from '../BACKEND/routes/rulesRoutes.js';
 
 import expenseRouter from '../BACKEND/routes/expenseRouter.js'
+import pollrouter from '../BACKEND/routes/pollRoute.js'
 
 
 
@@ -44,6 +45,7 @@ app.use("/api/annoucement",annoucementRoute);
 app.use("/api/rules",rulesRouter);
 app.use('/api/event', eventRouter);
 app.use('/api/expense',expenseRouter)
+app.use('/api/poll',pollrouter)
 
 
 app.get('/',(req,res) => {

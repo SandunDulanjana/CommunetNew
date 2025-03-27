@@ -29,8 +29,7 @@ const MyEvents = () => {
   return (
 
     <div>
-      My events
-      <Footer/>
+  
 
     <div className="flex flex-col min-h-screen p-4">
       <div className="flex justify-between items-center mb-6">
@@ -75,7 +74,7 @@ const MyEvents = () => {
       </div>
 
       <Footer />
-
+      </div>
     </div>
   );
 };
