@@ -1,15 +1,15 @@
-import {addannoucemnt,deleteAnnoucement,displayAllAnnoucemnts,displayAnnoucemnt,updateAnnoucement} from "../controllers/annoucementController.js";
+import {addAnnouncement,deleteAnnouncement,displayAllAnnouncements,displayAnnouncement,updateAnnouncement} from "../controllers/annoucementController.js";
 import express from"express";
 
 const annoucementRouter=express.Router();
-annoucementRouter.post("/addannoucemnt",addannoucemnt);
+annoucementRouter.post("/addannoucemnt",addAnnouncement);
 
-annoucementRouter.get("/annoucements", displayAllAnnoucemnts);
+annoucementRouter.get("/annoucements", displayAllAnnouncements);
 
-annoucementRouter.get("/displayAnnoucemnt/:audience", displayAnnoucemnt);
+annoucementRouter.get("/displayAnnoucemnt/:audience", displayAnnouncement);
 
-annoucementRouter.delete("/deleteAnnoucement/:id",deleteAnnoucement);
+annoucementRouter.delete("/deleteAnnoucement/:id",deleteAnnouncement);
 
-annoucementRouter.put("/updateAnnoucement/:id",updateAnnoucement);
+annoucementRouter.put("/updateAnnoucement/:id",updateAnnouncement);
 
 export default annoucementRouter;

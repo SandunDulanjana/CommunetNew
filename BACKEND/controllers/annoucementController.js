@@ -1,4 +1,4 @@
-import announcementModel from "../models/announcementModel.js"; // Fixed typo
+import annouceModel from "../models/annoucementModel.js"; // Fixed typo
 
 // Insert
 export const addAnnouncement = async (req, res) => {
@@ -16,7 +16,7 @@ export const addAnnouncement = async (req, res) => {
             audience,
         };
 
-        const newAnnouncement = new announcementModel(announcementData); // Fixed typo
+        const newAnnouncement = new annouceModel(announcementData); // Fixed typo
         await newAnnouncement.save();
 
         res.status(201).json({ success: true, message: "Announcement added successfully" }); // Added status code
@@ -29,7 +29,7 @@ export const addAnnouncement = async (req, res) => {
 // Read all announcements
 export const displayAllAnnouncements = async (req, res) => {
     try {
-        const allAnnouncements = await announcementModel.find(); // Fixed typo
+        const allAnnouncements = await annouceModel.find(); // Fixed typo
         return res.status(200).json({ success: true, allAnnouncements });
     } catch (error) {
         console.log(error);
@@ -41,7 +41,7 @@ export const displayAllAnnouncements = async (req, res) => {
 export const displayAnnouncement = async (req, res) => {
     try {
         const announcementAudience = req.params.audience;
-        const announcement = await announcementModel.find({ audience: announcementAudience }); // Fixed typo
+        const announcement = await annouceModel.find({ audience: announcementAudience }); // Fixed typo
 
         return res.status(200).json({ success: true, announcement });
     } catch (error) {
@@ -55,7 +55,7 @@ export const deleteAnnouncement = async (req, res) => {
     try {
         const announcementId = req.params.id;
 
-        await announcementModel.findByIdAndDelete(announcementId); // Fixed typo
+        await annouceModel.findByIdAndDelete(announcementId); // Fixed typo
 
         return res.status(200).json({ success: true, message: "Announcement deleted" }); // Added status code
     } catch (error) {
@@ -75,7 +75,7 @@ export const updateAnnouncement = async (req, res) => {
             return res.status(400).json({ success: false, message: "Missing details" }); // Added status code
         }
 
-        await announcementModel.findByIdAndUpdate(announcementId, { // Fixed typo
+        await annouceModel.findByIdAndUpdate(announcementId, { // Fixed typo
             $set: { Type, description, audience },
         });
 

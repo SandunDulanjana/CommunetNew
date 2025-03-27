@@ -9,5 +9,5 @@ const annouceSchema= new mongoose.Schema({
     
 })
 
-const annoucementModel= mongoose.model.annoucements || mongoose.model('annoucements',annouceSchema);
-export default annoucementModel;
+const annouceModel= mongoose.model.annoucements || mongoose.model('annoucements',annouceSchema);
+export default annouceModel;

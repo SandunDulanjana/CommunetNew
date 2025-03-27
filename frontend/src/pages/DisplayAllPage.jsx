@@ -10,7 +10,7 @@ export default function HOACommunicationDashboard() {
     // Fetch announcements from the backend
     const fetchAnnouncements = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/announcements");
+            const response = await axios.get("http://localhost:5000/api/annoucement/annoucements");
             console.log("Fetched Announcements:", response.data.AllAnnouncements); // Debugging
             setAnnouncements(response.data.AllAnnouncements || []);
         } catch (error) {
@@ -28,7 +28,7 @@ export default function HOACommunicationDashboard() {
         const confirmDelete = window.confirm("Are you sure you want to delete this announcement?");
         if (confirmDelete) {
             try {
-                await axios.delete(`http://localhost:5000/api/announcements/announcements/alll`);
+                await axios.delete(`http://localhost:5000/api/displayAnnoucemnt/3`);
 
                 setAnnouncements((prev) => prev.filter((announcement) => announcement._id !== id));
             } catch (error) {

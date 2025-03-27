@@ -21,10 +21,10 @@ const AnnouncementPage = () => {
         alert(
             `Type: ${announcement.Type}\nDescription: ${announcement.description}\nDate: ${announcement.date}\nAudience: ${announcement.audience}`
         );
-    
+
         try {
             const { data } = await axios.post(
-                `http://localhost:5000/api/addannoucemnt`,
+                'http://localhost:5000/api/annoucement/addannoucemnt',
                 announcement,
                 { headers: { 'Content-Type': 'application/json' } }
             );
@@ -35,7 +35,7 @@ const AnnouncementPage = () => {
             console.error("Error submitting announcement:", error);
         }
     };
-    
+
 
     return (
         <div className="max-w-lg mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
