@@ -55,7 +55,7 @@ const LogIn = () => {
             console.log("Navigating to CommuniCoPage");
             navigate("/CommuniCoPage");
             break;
-          case "67e034fd5758f1baf8765545":
+          case "67e52de6e522f26b95fa134b":
             console.log("Navigating to MaintanCoPage");
             navigate("/MaintanCoPage");
             break;

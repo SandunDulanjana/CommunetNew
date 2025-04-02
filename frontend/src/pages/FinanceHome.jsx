@@ -15,9 +15,7 @@ const FinanceHome = () => {
             Empowering you with the tools and insights <br className='hidden sm:block' /> to manage and optimize our financial growth
           </p>
         </div>
-        <a href="/expences" className='flex items-center gap-2 bg-black px-8 py-3 rounded-full text-white text-sm m-auto md:m-0 hover:bg-gray-800 transition-all duration-300'>
-          Create Expense Report <img className='w-3' src={assets.arrow_icon} alt="Arrow Icon" />
-        </a>
+        
       </div>
       {/* Right Section */}
       <div className='md:w-1/2 relative bg-gray-100'>

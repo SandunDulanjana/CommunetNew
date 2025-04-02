@@ -1,23 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Footer from '../componenets/Footer';
-import axios from 'axios';
-import AddMaintenance from './AddMaintenance';
-import { BrowserRouter } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Footer from "../componenets/Footer";
+import axios from "axios";
 
-const MyMaintance = () => {
+const MyMaintenance = () => {
   const navigate = useNavigate();
   const [maintenance, setMaintenance] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchMaintenance = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/maintenance/MaintainanceRequest/67e391e04676d10d769480f9`);
-        console.log('response:', response);
-        console.log('response data:', response.data);
-        setMaintenance(response.data.MaintainanceRequest);
+        const response = await axios.get(
+          "http://localhost:5000/api/maintenance/MaintainanceRequest/67e3975f8d608f55c9d1ebbf"
+        );
+        console.log("Response:", response);
+
+        if (response.data.success) {
+          setMaintenance(response.data.MaintainanceRequest);
+        } else {
+          setError(response.data.message || "Failed to fetch data.");
+        }
       } catch (error) {
-        console.error('Error fetching maintenance:', error);
+        console.error("Error fetching maintenance:", error);
+        setError("Failed to load maintenance data. Please try again later.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -25,25 +34,33 @@ const MyMaintance = () => {
   }, []);
 
   const handleEdit = (id) => {
-    // Navigate to the edit page with the maintenance ID
     navigate(`/EditMaintenance/${id}`);
   };
 
   const handleDelete = async (id) => {
     try {
-      const confirmDelete = window.confirm('Are you sure you want to delete this maintenance request?');
+      const confirmDelete = window.confirm(
+        "Are you sure you want to delete this maintenance request?"
+      );
       if (confirmDelete) {
-        await axios.delete(`http://localhost:5000/api/maintenance/DeleteMaintainanceRequest/${id}`);
-        alert('Maintenance request deleted successfully');
-        navigate('/'); // Redirect to the home page or the list of requests
+        await axios.delete(
+          `http://localhost:5000/api/maintenance/DeleteMaintainanceRequest/${id}`
+        );
+        alert("Maintenance request deleted successfully");
+        navigate("/"); // Redirect to home or maintenance list page
       }
     } catch (error) {
-      console.error('Error deleting maintenance:', error);
+      console.error("Error deleting maintenance:", error);
+      alert("Failed to delete maintenance request. Try again later.");
     }
   };
 
-  if (!maintenance) {
-    return <div>Loading...</div>;
+  if (loading) {
+    return <div className="text-center text-xl p-10">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-red-500 text-lg p-10">{error}</div>;
   }
 
   return (
@@ -52,7 +69,7 @@ const MyMaintance = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Maintenance Details</h1>
           <button
-            onClick={() => navigate('/AddMaintenance')}
+            onClick={() => navigate("/AddMaintenance")}
             className="bg-blue-500 text-white px-6 py-2 rounded-2xl shadow-lg hover:bg-blue-600 transition"
           >
             Add Maintenance
@@ -63,27 +80,38 @@ const MyMaintance = () => {
           <table className="min-w-full border-collapse border border-gray-300">
             <thead>
               <tr className="bg-gray-200">
-                <th className="p-2 border">House owner name</th>
+                <th className="p-2 border">House Owner</th>
                 <th className="p-2 border">Phone</th>
                 <th className="p-2 border">Email</th>
-                <th className="p-2 border">House number</th>
-                <th className="p-2 border">Maintenance type</th>
+                <th className="p-2 border">House No.</th>
+                <th className="p-2 border">Maintenance Type</th>
                 <th className="p-2 border">Description</th>
                 <th className="p-2 border">Priority</th>
-                <th className="p-2 border">Images</th>
+                <th className="p-2 border">Image</th>
                 <th className="p-2 border">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr className="hover:bg-gray-100">
-                <td className="p-2 border">{maintenance.name}</td>
-                <td className="p-2 border">{maintenance.phone}</td>
-                <td className="p-2 border">{maintenance.email}</td>
-                <td className="p-2 border">{maintenance.houseNo}</td>
-                <td className="p-2 border">{maintenance.category}</td>
-                <td className="p-2 border">{maintenance.details}</td>
-                <td className="p-2 border">{maintenance.priority}</td>
-                <td className="p-2 border">{maintenance.images}</td>
+                <td className="p-2 border">{maintenance?.name || "N/A"}</td>
+                <td className="p-2 border">{maintenance?.phone || "N/A"}</td>
+                <td className="p-2 border">{maintenance?.email || "N/A"}</td>
+                <td className="p-2 border">{maintenance?.houseNo || "N/A"}</td>
+                <td className="p-2 border">{maintenance?.category || "N/A"}</td>
+                <td className="p-2 border">{maintenance?.details || "N/A"}</td>
+                <td className="p-2 border">{maintenance?.priority || "N/A"}</td>
+                <td className="p-2 border">
+                  {maintenance?.images ? (
+                    <img
+                      src={maintenance.images}
+                      alt="Maintenance"
+                      className="w-16 h-16 object-cover rounded-lg"
+                      onError={(e) => (e.target.src = "/default-image.png")}
+                    />
+                  ) : (
+                    "No Image"
+                  )}
+                </td>
                 <td className="p-2 border">
                   <button
                     onClick={() => handleEdit(maintenance._id)}
@@ -109,4 +137,4 @@ const MyMaintance = () => {
   );
 };
 
-export default MyMaintance;
+export default MyMaintenance;
