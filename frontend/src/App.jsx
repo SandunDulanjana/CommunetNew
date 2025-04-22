@@ -72,14 +72,15 @@ function App() {
         <Route path='/UpdateEvent/:id' element = {<UpdateEvent/>}></Route>
         <Route path='/EditElection/:id' element = {<EditElection/>}></Route>
 
-        <Route path='/buy' element={<BuyPlans/>}></Route>
+        
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/payment" element={<Payment />} />
-
-        <Route path='/qr/:id' element = {<QR/>}></Route>
         <Route path='/expences' element={<Expences/>} />
+        <Route path='/buy' element={<BuyPlans/>}></Route>
+        
         <Route path='/EditMaintenance/:id' element = {<EditMaintenance/>}></Route>
         <Route path='/financeHome' element={<FinanceHome/>} />
+        <Route path='/qr/:id' element = {<QR/>}></Route>
 
         
 
