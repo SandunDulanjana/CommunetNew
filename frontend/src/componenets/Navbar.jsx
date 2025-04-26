@@ -26,6 +26,34 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  const handleDashboardClick = () => {
+    const userId = localStorage.getItem("userId");
+    
+    switch (userId) {
+      case "67e031c25758f1baf8765533":
+        navigate("/ElectionCoPage");
+        break;
+      case "67e034155758f1baf8765537":
+        navigate("/EventCoPage");
+        break;
+      case "67e034a75758f1baf876553d":
+        navigate("/FinaceCoPage");
+        break;
+      case "67e034bf5758f1baf8765541":
+        navigate("/CommuniCoPage");
+        break;
+      case "67e52de6e522f26b95fa134b":
+        navigate("/MaintanCoPage");
+        break;
+      case "67e03c255758f1baf8765549":
+        navigate("/AdminPage");
+        break;
+      default:
+        navigate("/RUserProfile");
+        break;
+    }
+  };
+
   return (
     <nav className="bg-sky-950 text-white p-4 shadow-lg rounded-b-2xl">
       <div className="container mx-auto flex justify-between items-center">
@@ -54,6 +82,7 @@ const Navbar = () => {
                   <p onClick={() => navigate('/RUserProfile')} className="hover:text-black cursor-pointer">My Profile</p>
                   <p onClick={() => navigate('/MyEvents')} className="hover:text-black cursor-pointer">My Events</p>
                   <p onClick={() => navigate('/MyMaintance')} className="hover:text-black cursor-pointer">My Maintenance</p>
+                  <p onClick={handleDashboardClick} className="hover:text-black cursor-pointer">Dashboard</p>
                   <p onClick={handleLogout} className="hover:text-black cursor-pointer">Logout</p>
                 </div>
               </div>
