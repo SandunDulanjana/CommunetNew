@@ -4,7 +4,12 @@ import { Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import Navbar from './componenets/Navbar';
 import AboutUs from './pages/AboutUs';
+
 import AdminPage from '../src/pages/AdminPage';
+import Adminadd from '../src/pages/Adminadd'
+import AdminUpdate from '../src/pages/AdminUpdate'
+
+
 import AddMaintenance from './pages/AddMaintenance';
 import AddElection from '../src/pages/AddElection'
 import AddEvent from './pages/AddEvent';
@@ -46,7 +51,10 @@ function App() {
       <Routes>
       <Route path='/' element = {<Home/>}></Route>
       <Route path='/AboutUs' element = {<AboutUs/>}></Route>
+      <Route path='/Adminadd' element = {<Adminadd/>}></Route>
       <Route path='/AdminPage' element = {<AdminPage/>}></Route>
+      <Route path='//AdminUpdate/:id' element = {<AdminUpdate/>}></Route>
+
       <Route path='/AddMaintenance' element = {<AddMaintenance/>}></Route>
       <Route path='/addElection' element = {<AddElection/>}></Route>
       <Route path='/AddEvent' element = {<AddEvent/>}></Route>

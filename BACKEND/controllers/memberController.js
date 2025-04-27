@@ -9,11 +9,12 @@ import jwt from 'jsonwebtoken';
 //API for add user data
 const addMember = async (req, res) => {
     try {
-        const { name, phoneNumber, bio, gender, NIC } = req.body;
+        console.log("Received body:", req.body);
+        const { name, email, password, houseNO, phoneNumber, gender, NIC, memberType } = req.body;
         const imageFile = req.file;
 
         // Check if all required data is present
-        if (!name || !email || !Password || !houseNO || !phoneNumber || !bio || !gender || !NIC) {
+        if (!name || !email || !password || !houseNO || !phoneNumber ||!gender || !NIC || !memberType ) {
             return res.json({ success: false, message: "Missing Details" });
         }
 
@@ -23,13 +24,13 @@ const addMember = async (req, res) => {
         }
 
         // Validate password
-        if (Password.length < 8) {
+        if (password.length < 8) {
             return res.json({ success: false, message: "Password is too short. It must be at least 8 characters." });
         }
 
         // Hashing member password
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(Password, salt);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
         let imageUrl = "";
         if (imageFile) {
@@ -45,12 +46,14 @@ const addMember = async (req, res) => {
         // Create member data
         const memberData = {
             name,
-            image: imageUrl, // Only set the image URL if an image is uploaded
+            email,
+            password: hashedPassword,
+            houseNO,
+            image: imageUrl,
             phoneNumber,
-            bio,
             gender,
             NIC,
-            
+            memberType
         };
 
         // Create new member in the database
@@ -66,15 +69,15 @@ const addMember = async (req, res) => {
                 email,
                 houseNO,
                 phoneNumber,
-                bio,
                 gender,
                 NIC,
                 image: imageUrl,
+                memberType
             },
         });
 
     } catch (error) {
-        console.log(error);
+        console.log("Error in addMember:", error);
         res.json({ success: false, message: error.message });
     }
 };
@@ -166,4 +169,44 @@ const deleteMember = async(req,res) => {
 }
 
 
-export { displayAllMembers, addMember, displayMember ,updateMember ,deleteMember};
+const updateAdminMember = async (req, res) => {
+    try {
+        const memberId = req.params.id;
+        const { name, email , houseNO, phoneNumber, gender, NIC, memberType } = req.body;
+        const imageFile = req.file;
+
+        // Validate required fields
+        if (!name || !email || !houseNO || !phoneNumber || !memberType || !gender || !NIC) {
+            return res.json({ success: false, message: "All fields are required" });
+        }
+
+        // Validate email format
+        if (!validator.isEmail(email)) {
+            return res.json({ success: false, message: "Please enter a valid email" });
+        }
+
+
+        // Construct update object
+        const updateData = {
+            name,
+            email,
+            houseNO,
+            phoneNumber,
+            gender,
+            NIC,
+            memberType
+        };
+
+        // Update member details in DB
+        await memberModel.findByIdAndUpdate(memberId, { $set: updateData });
+
+        return res.json({ success: true, message: "Member details updated successfully" });
+
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
+    }
+};
+
+
+
+export { displayAllMembers, addMember, displayMember ,updateMember ,deleteMember,updateAdminMember};
