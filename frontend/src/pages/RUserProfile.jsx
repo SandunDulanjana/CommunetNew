@@ -24,7 +24,12 @@ const RUserProfile = () => {
           return;
         }
 
-        const response = await axios.get(`http://localhost:5000/api/member/displayMember/${userId}`);
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`http://localhost:5000/api/member/displayMember/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         setUserData(response.data.Member);
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -36,10 +41,26 @@ const RUserProfile = () => {
 
   const handleSave = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/member/updateMember/${userId}`, userData);
-      setIsEdit(false);
+      const token = localStorage.getItem('token');
+      const response = await axios.put(
+        `http://localhost:5000/api/member/update-member/${userId}`,
+        userData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      if (response.data.success) {
+        alert('Profile updated successfully!');
+      } else {
+        alert(response.data.message);
+      }
     } catch (error) {
-      console.error("Error updating user data:", error);
+      console.error('Error updating profile:', error);
+      alert(error.response?.data?.message || 'Failed to update profile');
     }
   };
 

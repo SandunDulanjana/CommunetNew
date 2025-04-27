@@ -22,65 +22,53 @@ const LogIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log("Attempting login with:", { email, password });
-      
       const response = await axios.post("http://localhost:5000/api/user/login", {
         email,
         password,
       });
   
-      console.log("Login response:", response.data);
+      //console.log("Response Data:", response.data); 
   
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("email", response.data.email);
-        localStorage.setItem("userId", response.data.id);
+        localStorage.setItem("userId", response.data.id); 
         window.dispatchEvent(new Event("storage"));
   
-        // Let's check what ID we're getting
-        console.log("User ID from response:", response.data.id);
-        
-        // Add a default role check
-        const userRole = response.data.role || 'user'; // Get role from response or default to 'user'
-        console.log("User role:", userRole);
-
-        // Store the role in localStorage
-        localStorage.setItem("userRole", userRole);
-
-        // Navigate based on role instead of hardcoded IDs
-        switch (userRole) {
-          case "election":
+        console.log("User ID:", response.data.id);  
+  
+       
+        switch (response.data.id) {
+          case "67e031c25758f1baf8765533":
             console.log("Navigating to ElectionCoPage");
             navigate("/ElectionCoPage");
             break;
-          case "event":
+          case "67e034155758f1baf8765537":
             console.log("Navigating to EventCoPage");
             navigate("/EventCoPage");
             break;
-          case "finance":
+          case "67e034a75758f1baf876553d":
             console.log("Navigating to FinaceCoPage");
             navigate("/FinaceCoPage");
             break;
-          case "communication":
+          case "67e034bf5758f1baf8765541":
             console.log("Navigating to CommuniCoPage");
             navigate("/CommuniCoPage");
             break;
-          case "maintenance":
+          case "67e52de6e522f26b95fa134b":
             console.log("Navigating to MaintanCoPage");
             navigate("/MaintanCoPage");
             break;
-          case "admin":
+          case "67e03c255758f1baf8765549":
             console.log("Navigating to AdminPage");
             navigate("/AdminPage");
             break;
           default:
             console.log("Navigating to RUserProfile");
             navigate("/RUserProfile");
+            setMessage(response.data.message);
             break;
         }
-      } else {
-        console.log("Login failed:", response.data.message);
-        setMessage(response.data.message);
       }
   
     } catch (error) {
