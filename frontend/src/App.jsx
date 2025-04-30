@@ -30,7 +30,7 @@ import ElectionCoPage from '../src/pages/ElectionCoPage';
 import EventCoPage from '../src/pages/EventCoPage';
 import FinaceCoPage from '../src/pages/FinaceCoPage';
 import MaintanCoPage from '../src/pages/MaintanCoPage';
-
+import UpdatePassword from '../src/pages/password/UpdatePassword';
 
 import UpdateEvent from './pages/UpdateEvent';
 import EditElection from '../src/pages/EditElection'
@@ -90,7 +90,7 @@ function App() {
         <Route path='/financeHome' element={<FinanceHome/>} />
         <Route path='/qr/:id' element = {<QR/>}></Route>
 
-        
+        <Route path='/UpdatePassword' element={<UpdatePassword/>} />
 
       </Routes>
       

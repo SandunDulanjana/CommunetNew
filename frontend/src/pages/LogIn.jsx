@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import apartmentImage from "../assets/aprtmentL.jpg";
 import { useNavigate } from "react-router-dom"; 
 import axios from "axios";
- 
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // 👁️ import icons
 
 const LogIn = () => {
-  const [email, setEmail] = useState(""); // Always initialize with empty string
-  const [password, setPassword] = useState(""); // Always initialize with empty string
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const navigate = useNavigate(); // For navigating after login
+  const [showPassword, setShowPassword] = useState(false); // 👁️ toggle state
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,59 +27,44 @@ const LogIn = () => {
         email,
         password,
       });
-  
-      //console.log("Response Data:", response.data); 
-  
+
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("email", response.data.email);
-        localStorage.setItem("userId", response.data.id); 
+        localStorage.setItem("type", response.data.memberType);
         window.dispatchEvent(new Event("storage"));
-  
-        console.log("User ID:", response.data.id);  
-  
-       
-        switch (response.data.id) {
-          case "67e031c25758f1baf8765533":
-            console.log("Navigating to ElectionCoPage");
+
+        switch (response.data.memberType) {
+          case "electioncoordinator":
             navigate("/ElectionCoPage");
             break;
-          case "67e034155758f1baf8765537":
-            console.log("Navigating to EventCoPage");
+          case "eventcoordinator":
             navigate("/EventCoPage");
             break;
-          case "67e034a75758f1baf876553d":
-            console.log("Navigating to FinaceCoPage");
+          case "financecoordinator":
             navigate("/FinaceCoPage");
             break;
-          case "67e034bf5758f1baf8765541":
-            console.log("Navigating to CommuniCoPage");
+          case "communicationcoordinator":
             navigate("/CommuniCoPage");
             break;
-          case "67e52de6e522f26b95fa134b":
-            console.log("Navigating to MaintanCoPage");
+          case "maintenancecoordinator":
             navigate("/MaintanCoPage");
             break;
-          case "67e03c255758f1baf8765549":
-            console.log("Navigating to AdminPage");
+          case "admin":
             navigate("/AdminPage");
             break;
           default:
-            console.log("Navigating to RUserProfile");
             navigate("/RUserProfile");
             setMessage(response.data.message);
             break;
         }
+      } else {
+        alert("Invalid credentials. Please check your email and password.");
       }
-  
     } catch (error) {
       console.error("Login Error:", error);
       setMessage(error?.response?.data?.message || "Error logging in");
     }
   };
-  
-  
-  
 
   return (
     <div
@@ -88,30 +74,43 @@ const LogIn = () => {
       <div className="bg-white p-8 rounded-2xl shadow-lg w-96">
         <h2 className="text-2xl font-bold text-center text-sky-950">Login</h2>
         <form onSubmit={handleSubmit}>
+          {/* Email Field */}
           <div className="mb-4">
             <label className="block text-sky-950 text-sm mb-2">Email</label>
             <input
               type="email"
               name="email"
-              value={email}  // Always controlled by state
+              value={email}
               className="w-full p-3 rounded-lg bg-slate-400 border border-slate-400 text-gray-900 placeholder-gray-700 focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your email"
               onChange={handleChange}
               required
             />
           </div>
+
+          {/* Password Field with Eye Icon */}
           <div className="mb-4">
             <label className="block text-sky-950 text-sm mb-2">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={password} // Always controlled by state
-              className="w-full p-3 rounded-lg bg-slate-400 border border-slate-400 text-gray-900 placeholder-gray-700 focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your password"
-              onChange={handleChange}
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={password}
+                className="w-full p-3 pr-10 rounded-lg bg-slate-400 border border-slate-400 text-gray-900 placeholder-gray-700 focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter your password"
+                onChange={handleChange}
+                required
+              />
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-800 cursor-pointer"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
           </div>
+
+          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition"
@@ -119,10 +118,11 @@ const LogIn = () => {
             Login
           </button>
         </form>
+
         <p className="text-gray-400 text-sm text-center mt-4">
           <a href="#" className="text-blue-400 hover:underline">Forgot password?</a>
         </p>
-        <p>{message}</p>
+        <p className="text-red-500 text-sm text-center mt-2">{message}</p>
       </div>
     </div>
   );
