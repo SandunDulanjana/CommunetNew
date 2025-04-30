@@ -27,28 +27,35 @@ const Navbar = () => {
   };
 
   const handleDashboardClick = () => {
-    const userId = localStorage.getItem("userId");
+    const usertype = localStorage.getItem("type");
     
-    switch (userId) {
-      case "67e031c25758f1baf8765533":
+    switch (usertype) {
+      case "electioncoordinator":
+        console.log("Navigating to ElectionCoPage");
         navigate("/ElectionCoPage");
         break;
-      case "67e034155758f1baf8765537":
+      case "eventcoordinator":
+        console.log("Navigating to EventCoPage");
         navigate("/EventCoPage");
         break;
-      case "67e034a75758f1baf876553d":
+      case "financecoordinator":
+        console.log("Navigating to FinaceCoPage");
         navigate("/FinaceCoPage");
         break;
-      case "67e034bf5758f1baf8765541":
+      case "communicationcoordinator":
+        console.log("Navigating to CommuniCoPage");
         navigate("/CommuniCoPage");
         break;
-      case "67e52de6e522f26b95fa134b":
+      case "maintenancecoordinator":
+        console.log("Navigating to MaintanCoPage");
         navigate("/MaintanCoPage");
         break;
-      case "67e03c255758f1baf8765549":
+      case "admin":
+        console.log("Navigating to AdminPage");
         navigate("/AdminPage");
         break;
       default:
+        console.log("Navigating to RUserProfile");
         navigate("/RUserProfile");
         break;
     }

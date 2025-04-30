@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Footer from "../componenets/Footer";
 import axios from "axios";
-//this comment to identify the new project
+import { Link } from "react-router-dom";
+import Footer from '../componenets/Footer';
+
 const RUserProfile = () => {
   const [userData, setUserData] = useState({
     houseNO: "",
@@ -13,103 +14,203 @@ const RUserProfile = () => {
     gender: "",
     NIC: "",
   });
+
   const [isEdit, setIsEdit] = useState(false);
-  const userId = localStorage.getItem("userId");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        if (!userId) {
-          console.error("No user ID found.");
+        if (!token) {
+          console.error("No token found.");
+          setIsLoading(false);
           return;
         }
 
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`http://localhost:5000/api/member/displayMember/${userId}`, {
+        const response = await axios.get("http://localhost:5000/api/ProfileRouter/displayMember", {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
-        setUserData(response.data.Member);
+
+        if (response.data.success) {
+          setUserData(response.data.Member || userData);
+        } else {
+          console.error("Failed to fetch user data:", response.data.message);
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchUserData();
-  }, [userId]);
+  }, [token]);
 
   const handleSave = async () => {
+    const requiredFields = ["name", "houseNO", "email", "phoneNumber", "bio", "gender", "NIC"];
+
+    for (let field of requiredFields) {
+      if (!userData[field] || String(userData[field]).trim() === "") {
+        setError(`${field} is required.`);
+        return;
+      }
+    }
+
+    if (isEdit && !userData.image) {
+      setError("Profile image is required.");
+      return;
+    }
+
+    setError("");
+
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.put(
-        `http://localhost:5000/api/member/update-member/${userId}`,
-        userData,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      
+      const formData = new FormData();
+      formData.append("name", userData.name);
+      formData.append("houseNO", userData.houseNO);
+      formData.append("email", userData.email);
+      formData.append("phoneNumber", userData.phoneNumber);
+      formData.append("bio", userData.bio);
+      formData.append("gender", userData.gender);
+      formData.append("NIC", userData.NIC);
+
+      if (userData.image instanceof File) {
+        formData.append("image", userData.image);
+      }
+
+      const response = await axios.put("http://localhost:5000/api/ProfileRouter/updateMember", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       if (response.data.success) {
-        alert('Profile updated successfully!');
+        alert("Profile updated successfully!");
+        setUserData(response.data.updatedMember);
+        setIsEdit(false);
       } else {
         alert(response.data.message);
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
-      alert(error.response?.data?.message || 'Failed to update profile');
+      console.error("Error updating profile:", error);
+      alert(error.response?.data?.message || "Failed to update profile");
     }
   };
 
-  return (
-    <div className="bg-white text-black">
-      <div className="max-w-4xl mx-auto p-6 bg-white text-black rounded-lg shadow-lg mt-8 ">
-        <div className="flex justify-center">
-          <img
-            src={userData.image || "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAA..."} 
-            alt="User"
-            className="rounded-full border-4 border-sky-600"
-            width="100"
-            height="100"
-          />
-        </div>
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="animate-spin h-12 w-12 rounded-full border-4 border-blue-500 border-t-transparent"></div>
+      </div>
+    );
+  }
 
-        <div className="mt-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-semibold">User Profile</h2>
+  return (
+    <div>
+    <div className="min-h-screen flex bg-gray-100 text-gray-800">
+      {/* Sidebar */}
+      <div className="w-64 bg-white shadow-md p-6">
+        <h2 className="text-xl font-semibold mb-4">Settings</h2>
+        <ul className="space-y-2 text-sm">
+          <li className="text-blue-600 font-semibold">My Profile</li>
+          <li>
+            <Link to="/UpdatePassword" className="hover:text-blue-600">
+              Change Password
+            </Link>
+          </li>
+          <li>
+            <Link to="/TwoStepV" className="hover:text-blue-600">
+              Set Two-Step Verification
+            </Link>
+          </li>
+          <li>
+            <Link to="/delete-account" className="hover:text-red-600">
+              Delete Account
+            </Link>
+          </li>
+        </ul>
+      </div>
+
+      {/* Profile Content */}
+      <div className="flex-1 p-8">
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">My Profile</h2>
             <button
               onClick={() => (isEdit ? handleSave() : setIsEdit(true))}
-              className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-950 transition"
+              className="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-lg transition"
             >
               {isEdit ? "Save" : "Edit"}
             </button>
           </div>
 
-          <div className="mt-4 space-y-4">
-            <div className="flex flex-col">
-              <label className="font-medium">Name:</label>
-              {isEdit ? (
-                <input
-                  type="text"
-                  value={userData.name}
-                  onChange={(e) => setUserData((prev) => ({ ...prev, name: e.target.value }))}
-                  className="p-2 bg-gray-300 text-black rounded-lg border border-gray-600"
-                />
-              ) : (
-                <p>{userData.name || "No Name Provided"}</p>
-              )}
-            </div>
+          {error && <p className="text-red-500 mb-4">{error}</p>}
 
-            <div className="flex flex-col">
-              <label className="font-medium">Gender:</label>
+          <div className="flex items-center space-x-6 mb-6">
+            <div className="w-24 h-24 rounded-full overflow-hidden border">
+              <img
+                src={
+                  isEdit && userData.image instanceof File
+                    ? URL.createObjectURL(userData.image)
+                    : userData.image || "/default-avatar.png"
+                }
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            {isEdit && (
+              <input
+                type="file"
+                onChange={(e) =>
+                  setUserData((prev) => ({
+                    ...prev,
+                    image: e.target.files?.[0] || prev.image,
+                  }))
+                }
+                className="block text-sm text-gray-500"
+              />
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {["name", "houseNO", "email", "phoneNumber", "bio", "NIC"].map((field) => (
+              <div key={field}>
+                <label className="block text-sm font-medium mb-1 capitalize">{field}</label>
+                {isEdit ? (
+                  <input
+                    type="text"
+                    value={userData[field]}
+                    onChange={(e) =>
+                      setUserData((prev) => ({
+                        ...prev,
+                        [field]: e.target.value,
+                      }))
+                    }
+                    className="w-full p-2 border rounded-lg bg-gray-100"
+                  />
+                ) : (
+                  <p className="text-gray-700">{userData[field] || `No ${field} provided`}</p>
+                )}
+              </div>
+            ))}
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Gender</label>
               {isEdit ? (
                 <select
                   value={userData.gender}
-                  onChange={(e) => setUserData((prev) => ({ ...prev, gender: e.target.value }))}
-                  className="p-2 bg-gray-300 text-black rounded-lg border border-gray-600"
+                  onChange={(e) =>
+                    setUserData((prev) => ({
+                      ...prev,
+                      gender: e.target.value,
+                    }))
+                  }
+                  className="w-full p-2 border rounded-lg bg-gray-100"
                 >
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
@@ -117,88 +218,18 @@ const RUserProfile = () => {
                   <option value="Other">Other</option>
                 </select>
               ) : (
-                <p>{userData.gender || "No Gender Provided"}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col">
-              <label className="font-medium">Bio:</label>
-              {isEdit ? (
-                <input
-                  type="text"
-                  value={userData.bio}
-                  onChange={(e) => setUserData((prev) => ({ ...prev, bio: e.target.value }))}
-                  className="p-2 bg-gray-300 text-black rounded-lg border border-gray-600"
-                />
-              ) : (
-                <p>{userData.bio || "No Bio Provided"}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col">
-              <label className="font-medium">House No:</label>
-              {isEdit ? (
-                <input
-                  type="text"
-                  value={userData.houseNO}
-                  onChange={(e) => setUserData((prev) => ({ ...prev, houseNO: e.target.value }))}
-                  className="p-2 bg-gray-300 text-black rounded-lg border border-gray-600"
-                />
-              ) : (
-                <p>{userData.houseNO || "No House Number Provided"}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col">
-              <label className="font-medium">NIC:</label>
-              {isEdit ? (
-                <input
-                  type="text"
-                  value={userData.NIC}
-                  onChange={(e) => setUserData((prev) => ({ ...prev, NIC: e.target.value }))}
-                  className="p-2 bg-gray-300 text-black rounded-lg border border-gray-600"
-                />
-              ) : (
-                <p>{userData.NIC || "No NIC Provided"}</p>
-              )}
-            </div>
-
-            <hr className="my-6 border-gray-600" />
-
-            <p className="text-xl font-semibold">CONTACT INFORMATION</p>
-
-            <div className="flex flex-col">
-              <label className="font-medium">Phone Number:</label>
-              {isEdit ? (
-                <input
-                  type="text"
-                  value={userData.phoneNumber}
-                  onChange={(e) => setUserData((prev) => ({ ...prev, phoneNumber: e.target.value }))}
-                  className="p-2 bg-gray-300 text-black rounded-lg border border-gray-600"
-                />
-              ) : (
-                <p>{userData.phoneNumber || "No Phone Number Provided"}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col">
-              <label className="font-medium">Email:</label>
-              {isEdit ? (
-                <input
-                  type="text"
-                  value={userData.email}
-                  onChange={(e) => setUserData((prev) => ({ ...prev, email: e.target.value }))}
-                  className="p-2 bg-gray-300 text-black rounded-lg border border-gray-600"
-                />
-              ) : (
-                <p>{userData.email || "No Email Provided"}</p>
+                <p className="text-gray-700">{userData.gender || "No gender provided"}</p>
               )}
             </div>
           </div>
         </div>
       </div>
-      <Footer />
+
+      
     </div>
+  
+    <Footer />
+  </div>
   );
 };
 

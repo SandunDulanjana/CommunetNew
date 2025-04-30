@@ -20,6 +20,9 @@ import rulesRouter from '../BACKEND/routes/rulesRoutes.js';
 
 import expenseRouter from '../BACKEND/routes/expenseRouter.js'
 import pollrouter from '../BACKEND/routes/pollRoute.js'
+import ProfileRouter from '../BACKEND/routes/ProfileRoute.js'
+
+
 
 
 
@@ -39,7 +42,7 @@ app.use(express.json());
 
 //api endpoints
 app.use('/api/member', memberRouter);
-app.use('/api/addmaintenace', maintenanceRoute);
+app.use('/api/maintenace', maintenanceRoute);
 app.use('/api/user', userRouter);
 app.use('/api/annoucement', annoucementRoute);
 app.use('/api/rules', rulesRouter);
@@ -47,6 +50,7 @@ app.use('/api/rules', rulesRouter);
 app.use('/api/event', eventRouter);
 app.use('/api/expense',expenseRouter)
 app.use('/api/poll',pollrouter)
+app.use('/api/ProfileRouter',ProfileRouter)
 
 
 
