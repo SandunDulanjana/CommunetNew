@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 const pollSchema = new mongoose.Schema({
 
-        quaction:{type:String, required: true},
+        question:{type:String, required: true},
         options : [
            {
             optionText : { type:String, required:true },

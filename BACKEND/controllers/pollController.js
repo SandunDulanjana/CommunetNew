@@ -1,4 +1,5 @@
 import Poll from "../models/pollModel.js";
+import mongoose from "mongoose";
 
 // Get all polls
 export const getAllPolls = async (req, res) => {
@@ -12,14 +13,26 @@ export const getAllPolls = async (req, res) => {
 
 // Create a poll
 export const createPoll = async (req, res) => {
-  const { question, options } = req.body;
-  const newPoll = new Poll({ question, options });
+  const { question, options, creator } = req.body;
+  
+  if (!creator) {
+    return res.status(400).json({ message: "Creator ID is required" });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(creator)) {
+    return res.status(400).json({ message: "Invalid creator ID format" });
+  }
 
   try {
+    const newPoll = new Poll({ question, options, creator });
     await newPoll.save();
     res.status(201).json(newPoll);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error("Error creating poll:", err);
+    res.status(400).json({ 
+      message: err.message,
+      details: err.errors ? Object.values(err.errors).map(e => e.message) : []
+    });
   }
 };
 
@@ -37,15 +50,32 @@ export const deletePoll = async (req, res) => {
 export const updatePoll = async (req, res) => {
   const { question, options, closed } = req.body;
 
+  if (!question) {
+    return res.status(400).json({ message: "Question is required" });
+  }
+
   try {
     const updatedPoll = await Poll.findByIdAndUpdate(
       req.params.id,
-      { question, options, closed },
-      { new: true }
+      { 
+        question: question,
+        options: options,
+        closed: closed 
+      },
+      { new: true, runValidators: true }
     );
+
+    if (!updatedPoll) {
+      return res.status(404).json({ message: "Poll not found" });
+    }
+
     res.json(updatedPoll);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error("Error updating poll:", err);
+    res.status(400).json({ 
+      message: err.message,
+      details: err.errors ? Object.values(err.errors).map(e => e.message) : []
+    });
   }
 };
 
