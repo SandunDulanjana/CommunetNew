@@ -44,6 +44,13 @@ import Expences from './pages/Expences'
 import EditMaintenance from './pages/EditMaintenance';
 import FinanceHome from './pages/FinanceHome';
 
+import Notifications from './pages/notifications';
+import Settings from './pages/settings';
+
+import AddRule from './pages/addrule';
+import UpdateRule from './pages/updaterule';
+import DisplayRules from './pages/displayRules';
+
 function App() {
   return (
     <div className='mx-4 sm:max-[10%]:'>
@@ -91,6 +98,14 @@ function App() {
         <Route path='/qr/:id' element = {<QR/>}></Route>
 
         <Route path='/UpdatePassword' element={<UpdatePassword/>} />
+
+        <Route path='/notifications' element={<Notifications />} />
+        <Route path='/settings' element={<Settings />} />
+
+        <Route path='/addrule' element={<AddRule />} />
+        <Route path='/updaterule/:id' element={<UpdateRule />} />
+
+        <Route path='/community-rules' element={<DisplayRules />} />
 
       </Routes>
       

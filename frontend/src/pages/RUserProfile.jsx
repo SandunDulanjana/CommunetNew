@@ -121,16 +121,16 @@ const RUserProfile = () => {
           <li>
             <Link to="/UpdatePassword" className="hover:text-blue-600">
               Change Password
+            </Link> 
+          </li>
+          <li>
+            <Link to="/notifications" className="hover:text-blue-600">
+              Notifications
             </Link>
           </li>
           <li>
-            <Link to="/TwoStepV" className="hover:text-blue-600">
-              Set Two-Step Verification
-            </Link>
-          </li>
-          <li>
-            <Link to="/delete-account" className="hover:text-red-600">
-              Delete Account
+            <Link to="/settings" className="hover:text-blue-600">
+              Settings
             </Link>
           </li>
         </ul>

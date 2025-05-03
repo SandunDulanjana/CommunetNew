@@ -31,6 +31,7 @@ const registerUser = async (req, res) => {
       houseNO,
       email,
       password: hashedPassword, // Updated field name to 'password'
+      memberType: 'member', // Set default member type
       date: Date.now(),
     };
 
