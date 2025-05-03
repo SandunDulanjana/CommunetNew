@@ -30,7 +30,9 @@ import ElectionCoPage from '../src/pages/ElectionCoPage';
 import EventCoPage from '../src/pages/EventCoPage';
 import FinaceCoPage from '../src/pages/FinaceCoPage';
 import MaintanCoPage from '../src/pages/MaintanCoPage';
-import UpdatePassword from '../src/pages/password/UpdatePassword';
+import UpdatePassword from '../src/pages/setting/UpdatePassword';
+import UpdateEmail from '../src/pages/setting/UpdateEmail';
+import TwoStepV from '../src/pages/setting/TwoStepV';
 
 import UpdateEvent from './pages/UpdateEvent';
 import EditElection from '../src/pages/EditElection'
@@ -98,9 +100,10 @@ function App() {
         <Route path='/qr/:id' element = {<QR/>}></Route>
 
         <Route path='/UpdatePassword' element={<UpdatePassword/>} />
-
         <Route path='/notifications' element={<Notifications />} />
         <Route path='/settings' element={<Settings />} />
+        <Route path='/UpdateEmail' element={<UpdateEmail />} />
+        <Route path='/TwoStepV' element={<TwoStepV />} />
 
         <Route path='/addrule' element={<AddRule />} />
         <Route path='/updaterule/:id' element={<UpdateRule />} />

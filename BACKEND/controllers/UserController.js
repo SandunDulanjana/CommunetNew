@@ -2,6 +2,7 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import memberModel from "../models/memberModel.js";
 import jwt from 'jsonwebtoken';
+import express from 'express'
 
 // API for user registration
 const registerUser = async (req, res) => {
@@ -30,8 +31,8 @@ const registerUser = async (req, res) => {
     const user = {
       houseNO,
       email,
-      password: hashedPassword, // Updated field name to 'password'
-      memberType: 'member', // Set default member type
+      password: hashedPassword,
+      memberType: 'member',
       date: Date.now(),
     };
 
@@ -48,8 +49,6 @@ const registerUser = async (req, res) => {
 };
 
 // API for user login
-
-
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -66,7 +65,7 @@ const loginUser = async (req, res) => {
       res.json({ 
         success: true, 
         token,
-        memberType: user.memberType, // Corrected
+        memberType: user.memberType,
         email: user.email 
       });
     } else {
@@ -77,6 +76,5 @@ const loginUser = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
-
 
 export { registerUser, loginUser };

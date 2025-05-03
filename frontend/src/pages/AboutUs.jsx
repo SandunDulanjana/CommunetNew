@@ -1,6 +1,9 @@
 import React from 'react';
-import Navbar from '../componenets/Navbar';
 import Footer from '../componenets/Footer';
+import aboutusImg from '../assets/aboutus.jpg'
+import presidentImg from '../assets/president.jpeg'
+import vicetImg from '../assets/vice.jpeg'
+import treshImg from '../assets/tresh.jpeg'
 
 const AboutUs = () => {
   return (
@@ -11,7 +14,7 @@ const AboutUs = () => {
         <section className="relative h-[60vh] bg-blue-600">
           <div className="absolute inset-0 bg-black/50 z-10"></div>
           <img
-            src="/assets/community-aerial.jpg"
+            src={aboutusImg}
             alt="Community Aerial View"
             className="w-full h-full object-cover"
           />
@@ -50,7 +53,7 @@ const AboutUs = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="bg-white rounded-lg overflow-hidden shadow-lg">
                 <img
-                  src="/assets/board-member-1.jpg"
+                  src={presidentImg}
                   alt="Board Member"
                   className="w-full h-64 object-cover"
                 />
@@ -62,7 +65,7 @@ const AboutUs = () => {
               </div>
               <div className="bg-white rounded-lg overflow-hidden shadow-lg">
                 <img
-                  src="/assets/board-member-2.jpg"
+                  src={vicetImg}
                   alt="Board Member"
                   className="w-full h-64 object-cover"
                 />
@@ -74,7 +77,7 @@ const AboutUs = () => {
               </div>
               <div className="bg-white rounded-lg overflow-hidden shadow-lg">
                 <img
-                  src="/assets/board-member-3.jpg"
+                  src={treshImg}
                   alt="Board Member"
                   className="w-full h-64 object-cover"
                 />
