@@ -14,12 +14,12 @@ import memberRouter from './routes/memberRoute.js';
 import maintenanceRoute from '../BACKEND/routes/maintenanceRoute.js';
 import userRouter from '../BACKEND/routes/UserRoute.js';
 import eventRouter from '../BACKEND/routes/eventRoute.js';
-import annoucementRoute from '../BACKEND/routes/annoucemntRoute.js';
+import announcementRouter from './routes/annoucemntRouter.js';
 import ruleRoutes from './routes/ruleRoutes.js';
 import expenseRouter from '../BACKEND/routes/expenseRouter.js';
 import pollrouter from '../BACKEND/routes/pollRoute.js';
 import ProfileRouter from '../BACKEND/routes/ProfileRoute.js';
-
+import ticketRouter from '../BACKEND/routes/TicketRoute.js';
 //app config
 const app = express();
 const port = process.env.PORT || 5000;
@@ -45,13 +45,13 @@ app.use((err, req, res, next) => {
 app.use('/api/member', memberRouter);
 app.use('/api/maintenace', maintenanceRoute);
 app.use('/api/user', userRouter);
-app.use('/api/annoucement', annoucementRoute);
+app.use('/api/announcement', announcementRouter);
 app.use('/api/rules', ruleRoutes);
 app.use('/api/event', eventRouter);
 app.use('/api/expense', expenseRouter);
 app.use('/api/poll', pollrouter);
 app.use('/api/ProfileRouter', ProfileRouter);
-
+app.use('/api/ticket', ticketRouter);
 // QR Code generation endpoint
 app.post('/api/generate-qr', async (req, res) => {
   const { url } = req.body;
