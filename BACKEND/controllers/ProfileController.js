@@ -397,11 +397,102 @@ const verifyOTP = async (req, res) => {
   }
 };
 
+// Verify password before deletion
+const verifyDeletePassword = async (req, res) => {
+  try {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized: No token provided" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const memberId = decoded.id;
+
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ success: false, message: "Password is required" });
+    }
+
+    const member = await memberModel.findById(memberId);
+    if (!member) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(password, member.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: "Incorrect password" });
+    }
+
+    res.status(200).json({ 
+      success: true, 
+      message: "Password verified successfully" 
+    });
+
+  } catch (error) {
+    console.error("Error in verifyDeletePassword:", error.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// Delete account
+const deleteAccount = async (req, res) => {
+  try {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized: No token provided" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const memberId = decoded.id;
+
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ success: false, message: "Password is required" });
+    }
+
+    const member = await memberModel.findById(memberId);
+    if (!member) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(password, member.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: "Incorrect password" });
+    }
+
+    // Send farewell email before deletion
+    await sendEmail(
+      member.email,
+      "Account Deletion Confirmation",
+      `<h3>Goodbye ${member.name},</h3>
+       <p>Your account has been successfully deleted from Communet.</p>
+       <p>We're sorry to see you go. If you change your mind, you can always create a new account.</p>
+       <p><b>Communet Team</b></p>`
+    );
+
+    // Delete the member
+    await memberModel.findByIdAndDelete(memberId);
+
+    res.status(200).json({ 
+      success: true, 
+      message: "Account deleted successfully" 
+    });
+
+  } catch (error) {
+    console.error("Error in deleteAccount:", error.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 export { 
   displayMember, 
   updateMember, 
   changePassword, 
   updateEmail,
   sendOTP,
-  verifyOTP 
+  verifyOTP,
+  verifyDeletePassword,
+  deleteAccount 
 };

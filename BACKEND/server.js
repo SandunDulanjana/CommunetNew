@@ -18,7 +18,7 @@ import announcementRouter from './routes/annoucemntRouter.js';
 import ruleRoutes from './routes/ruleRoutes.js';
 import expenseRouter from '../BACKEND/routes/expenseRouter.js';
 import pollrouter from '../BACKEND/routes/pollRoute.js';
-import ProfileRouter from '../BACKEND/routes/ProfileRoute.js';
+import ProfileRouter from './routes/ProfileRoute.js';
 import ticketRouter from '../BACKEND/routes/TicketRoute.js';
 //app config
 const app = express();

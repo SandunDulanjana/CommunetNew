@@ -1,8 +1,72 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { FiMail, FiLock, FiShield, FiTrash2, FiUser, FiBell } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const Settings = () => {
+  const navigate = useNavigate();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [password, setPassword] = useState('');
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleDeleteClick = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        'http://localhost:5000/api/ProfileRouter/verify-delete',
+        { password },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setIsDeleteModalOpen(false);
+        setIsConfirmModalOpen(true);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to verify password');
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await axios.delete(
+        'http://localhost:5000/api/ProfileRouter/delete',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          data: { password }
+        }
+      );
+
+      if (response.data.success) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('type');
+        toast.success('Account deleted successfully');
+        navigate('/Login');
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete account');
+    } finally {
+      setIsLoading(false);
+      setIsConfirmModalOpen(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -110,7 +174,10 @@ const Settings = () => {
                     <div className="ml-4 flex-1">
                       <h2 className="text-lg font-semibold text-red-600">Delete Account</h2>
                       <p className="mt-1 text-gray-600">Permanently delete your account and all associated data.</p>
-                      <button className="mt-4 bg-red-600 text-white px-6 py-2.5 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium">
+                      <button 
+                        onClick={handleDeleteClick}
+                        className="mt-4 bg-red-600 text-white px-6 py-2.5 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium"
+                      >
                         Delete Account
                       </button>
                     </div>
@@ -121,6 +188,68 @@ const Settings = () => {
           </div>
         </div>
       </div>
+
+      {/* Password Verification Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Verify Your Password</h3>
+            <p className="text-gray-600 mb-4">Please enter your password to confirm account deletion.</p>
+            <form onSubmit={handlePasswordSubmit}>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                placeholder="Enter your password"
+                required
+              />
+              <div className="mt-4 flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700"
+                >
+                  Verify
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {isConfirmModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold text-red-600 mb-4">Confirm Account Deletion</h3>
+            <p className="text-gray-600 mb-4">
+              Are you sure you want to delete your account? This action cannot be undone.
+            </p>
+            <div className="mt-4 flex justify-end space-x-3">
+              <button
+                onClick={() => setIsConfirmModalOpen(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                disabled={isLoading}
+                className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {isLoading ? 'Deleting...' : 'Delete Account'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
