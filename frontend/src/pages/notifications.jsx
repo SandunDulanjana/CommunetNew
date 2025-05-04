@@ -1,8 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiUser, FiBell, FiShield } from 'react-icons/fi';
+import axios from 'axios';
 
 const Notifications = () => {
+  const [announcements, setAnnouncements] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('Please log in to view notifications');
+      setLoading(false);
+      return;
+    }
+
+    axios.get('http://localhost:5000/api/announcement/audience-announcements', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then(res => {
+      const data = res.data;
+      if (data.success) {
+        setAnnouncements(data.announcements);
+        setError('');
+      } else {
+        setError(data.message || 'Failed to load notifications.');
+      }
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error('Error fetching notifications:', error.response?.data || error.message);
+      setError(error.response?.data?.message || 'Failed to load notifications. Please try again later.');
+      setLoading(false);
+    });
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -32,9 +67,23 @@ const Notifications = () => {
           <div className="flex-1">
             <div className="bg-white rounded-2xl shadow-sm p-8">
               <h1 className="text-2xl font-bold text-gray-900 mb-6">Notifications</h1>
-              <div className="text-gray-600 text-center">
-                You have no new notifications.
-              </div>
+              {loading ? (
+                <div className="text-gray-600 text-center">Loading...</div>
+              ) : error ? (
+                <div className="text-red-500 text-center">{error}</div>
+              ) : announcements.length === 0 ? (
+                <div className="text-gray-600 text-center">You have no new notifications.</div>
+              ) : (
+                <ul className="space-y-4">
+                  {announcements.map(a => (
+                    <li key={a._id} className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+                      <div className="font-semibold text-blue-700">{a.Type}</div>
+                      <div className="text-gray-700">{a.discription}</div>
+                      <div className="text-xs text-gray-400 mt-1">{new Date(a.date).toLocaleString()}</div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
         </div>

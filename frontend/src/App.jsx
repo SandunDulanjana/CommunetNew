@@ -53,6 +53,12 @@ import AddRule from './pages/addrule';
 import UpdateRule from './pages/updaterule';
 import DisplayRules from './pages/displayRules';
 
+import AddAnnoucement from './pages/AddAnnoucement';
+import UpdateAddAnnoucement from './pages/UpdateAddAnnoucement';
+import DisplayAllAnnoucement from './pages/DisplayAllAnnoucement';
+
+import Ticket from './pages/Ticket';
+
 function App() {
   return (
     <div className='mx-4 sm:max-[10%]:'>
@@ -110,6 +116,11 @@ function App() {
 
         <Route path='/community-rules' element={<DisplayRules />} />
 
+        <Route path='/addannoucement' element={<AddAnnoucement />} />
+        <Route path='/updateannoucement/:id' element={<UpdateAddAnnoucement />} />
+        <Route path='/displayallannoucement' element={<DisplayAllAnnoucement />} />
+
+        <Route path='/ticket' element={<Ticket />} />
       </Routes>
       
     </div>
