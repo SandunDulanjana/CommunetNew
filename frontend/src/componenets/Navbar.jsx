@@ -4,6 +4,8 @@ import logo from "../assets/logo.png";
 import profile from "../assets/profile.jpg";
 import menu from "../assets/menuicon.png";
 import axios from "axios";
+import { FiBell } from 'react-icons/fi';
+
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -204,8 +206,17 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* User Actions */}
+        {/* Profile and Notification Icon */}
         <div className="flex items-center space-x-4">
+          {token && (
+            <button
+              className="relative focus:outline-none"
+              onClick={() => navigate('/notifications')}
+              title="Notifications"
+            >
+              <FiBell className="w-6 h-6 text-white hover:text-blue-400 transition-colors duration-200" />
+            </button>
+          )}
           {token ? (
             <div className="flex items-center gap-3">
               <div className="relative" ref={dropdownRef}>

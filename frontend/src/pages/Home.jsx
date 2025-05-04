@@ -1,6 +1,8 @@
 import React from 'react';
 import Footer from '../componenets/Footer';
 import HomeHeder from '../componenets/HomeHeder';
+import poolImg from '../assets/pool.jpg'; 
+import gardenImg from '../assets/garden.jpg'; 
 
 const Home = () => {
   return (
@@ -54,7 +56,7 @@ const Home = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="relative h-96 rounded-lg overflow-hidden">
                 <img
-                  src="/assets/community-pool.jpg"
+                  src={poolImg}
                   alt="Community Pool"
                   className="w-full h-full object-cover"
                 />
@@ -68,7 +70,7 @@ const Home = () => {
               
               <div className="relative h-96 rounded-lg overflow-hidden">
                 <img
-                  src="/assets/community-garden.jpg"
+                  src={gardenImg}
                   alt="Community Garden"
                   className="w-full h-full object-cover"
                 />

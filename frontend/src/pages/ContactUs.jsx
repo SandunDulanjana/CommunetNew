@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '../componenets/Navbar';
 import Footer from '../componenets/Footer';
+import contactImg from '../assets/contact.jpg'
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -32,7 +33,7 @@ const ContactUs = () => {
         <section className="relative h-[40vh] bg-blue-600">
           <div className="absolute inset-0 bg-black/50 z-10"></div>
           <img
-            src="/assets/contact-hero.jpg"
+            src={contactImg}
             alt="Contact Us"
             className="w-full h-full object-cover"
           />
