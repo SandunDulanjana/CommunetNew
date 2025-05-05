@@ -30,7 +30,7 @@ connectCloudinary();
 
 //middlewares
 app.use(cors({
-  origin: 'http://localhost:5173', // Add your frontend URL
+  origin: true,
   credentials: true
 }));
 app.use(express.json());
@@ -71,7 +71,7 @@ app.get('/', (req, res) => {
 });
 
 // Start server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on port ${port}`);
   console.log(`API available at http://localhost:${port}`);
 });
