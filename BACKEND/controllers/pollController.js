@@ -1,5 +1,6 @@
 import Poll from "../models/pollModel.js";
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 
 // Get all polls
 export const getAllPolls = async (req, res) => {
@@ -83,12 +84,17 @@ export const updatePoll = async (req, res) => {
 export const votePoll = async (req, res) => {
   try {
     const poll = await Poll.findById(req.params.id);
-    const { optionIndex, userId } = req.body;
+    const { optionIndex } = req.body;
 
-    // Log for debugging
-    console.log('Poll ID:', req.params.id);
-    console.log('Option Index:', optionIndex);
-    console.log('User ID:', userId);
+    // Get token from header
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    // Decode token to get user id
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
 
     // Ensure the optionIndex is within bounds
     if (optionIndex < 0 || optionIndex >= poll.options.length) {

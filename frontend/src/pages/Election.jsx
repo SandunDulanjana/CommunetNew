@@ -26,23 +26,28 @@ const Election = () => {
     }
   };
 
-  const votePoll = async (pollId, optionIndex) => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
+  const handleVote = async (pollId, optionIndex) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
       alert("Please log in to vote.");
       return;
     }
 
     if (votes[pollId]) {
-      alert("You have already voted!");
+      alert("You have already voted in this poll.");
       return;
     }
 
     try {
-      await axios.post(`http://localhost:5000/api/poll/${pollId}/vote`, {
-        optionIndex,
-        userId,
-      });
+      await axios.post(
+        `http://localhost:5000/api/poll/${pollId}/vote`,
+        { optionIndex },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
       setVotes({ ...votes, [pollId]: true });
       setSelectedOptions({ ...selectedOptions, [pollId]: optionIndex });
       fetchPolls(); // Refresh the polls to show updated results
@@ -97,7 +102,7 @@ const Election = () => {
                                     ? 'border-blue-500 bg-blue-50'
                                     : 'border-gray-200 hover:border-blue-300'
                                 }`}
-                                onClick={() => !poll.closed && votePoll(poll._id, index)}
+                                onClick={() => !poll.closed && handleVote(poll._id, index)}
                               >
                                 <div className="flex justify-between items-center">
                                   <span className="text-gray-700">{option.optionText}</span>
