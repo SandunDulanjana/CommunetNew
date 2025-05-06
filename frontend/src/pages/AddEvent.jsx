@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import axios from 'axios';
 import Footer from '../componenets/Footer';
@@ -18,6 +17,13 @@ const AddEvent = () => {
 
     const onSubmitHandler = async (e) => {
         e.preventDefault();
+        const token = localStorage.getItem("token");
+        console.log("AddEvent - Token from localStorage:", token);
+
+        if (!token) {
+            alert('Please login to add an event');
+            return;
+        }
 
         if (!/^\d{10}$/.test(organizarContactNo)) {
             setError("Contact number must be exactly 10 digits.");
@@ -37,21 +43,42 @@ const AddEvent = () => {
                 organizarContactNo,
                 organizarEmail,
                 expectedCount,
-                requestType, 
+                requestType,
+                status: 'Pending'
             };
 
-            console.log("Form data being sent:", formData);
+            console.log("AddEvent - Form data being sent:", formData);
 
-            const { data } = await axios.post('http://localhost:5000/api/event/add-event', formData);
-
-            if (data.success) {
-                console.log("Event added successfully");
-                alert('Event added successfully');
+            const response = await axios.post(
+                "http://localhost:5000/api/event/add-event",
+                formData,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+            console.log("AddEvent - Response from server:", response.data);
+            
+            if (response.data.success) {
+                alert("Event added successfully!");
+                // Clear form fields
+                setEventName('');
+                setOrganizarName('');
+                setDescription('');
+                setDate('');
+                setStartTime('');
+                setVenue('');
+                setOrganizarContactNo('');
+                setOrganizarEmail('');
+                setExpectedCount(0);
+                setRequestType('');
             } else {
-                console.error("Failed to add event: ", data.message);
+                alert(response.data.message || "Failed to add event");
             }
         } catch (error) {
-            console.error("Error submitting form:", error);
+            console.error("AddEvent - Error:", error);
+            alert(error.response?.data?.message || "Failed to add event. Please try again.");
         }
     };
 
