@@ -13,12 +13,12 @@ const MyMaintenance = () => {
     const fetchMaintenance = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/maintenance/MaintainanceRequest/67e3975f8d608f55c9d1ebbf"
+          "http://localhost:5000/api/maintenance/MaintenanceRequest/67e51f88e522f26b95fa12d1"
         );
         console.log("Response:", response);
 
         if (response.data.success) {
-          setMaintenance(response.data.MaintainanceRequest);
+          setMaintenance(response.data.maintenanceRequest);
         } else {
           setError(response.data.message || "Failed to fetch data.");
         }
@@ -44,7 +44,7 @@ const MyMaintenance = () => {
       );
       if (confirmDelete) {
         await axios.delete(
-          `http://localhost:5000/api/maintenance/DeleteMaintainanceRequest/${id}`
+          `http://localhost:5000/api/maintenance/DeleteMaintenanceRequest/${id}`
         );
         alert("Maintenance request deleted successfully");
         navigate("/"); // Redirect to home or maintenance list page

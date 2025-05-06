@@ -21,8 +21,8 @@ const EditMaintenance = () => {
   useEffect(() => {
     const fetchMaintenance = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/maintenance/MaintainanceRequest/${id}`);
-        setMaintenance(response.data.MaintainanceRequest);
+        const response = await axios.get(`http://localhost:5000/api/maintenance/MaintenanceRequest/${id}`);
+        setMaintenance(response.data.maintenanceRequest);
       } catch (error) {
         console.error('Error fetching maintenance:', error);
       }
@@ -60,7 +60,7 @@ const EditMaintenance = () => {
 
       // Make the PUT request to update the maintenance request
       const { data } = await axios.put(
-        `http://localhost:5000/api/maintenance/UpdateMaintainanceRequest/${id}`,
+        `http://localhost:5000/api/maintenance/UpdateMaintenanceRequest/${id}`,
         formDataObj,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );

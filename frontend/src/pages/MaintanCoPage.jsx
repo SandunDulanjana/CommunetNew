@@ -10,7 +10,7 @@ function MaintanCoPage() {
   useEffect(() => {
     const fetchMaintenance = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/maintenance/displayAllMaintainRequests`);
+        const response = await axios.get(`http://localhost:5000/api/maintenance/displayAllMaintenanceRequests`);
         console.log('response data:', response.data);
         // Check if response data contains MaintainanceRequest and set it, else set empty array
         setRequests(response.data.AllMaintainanceRequests || []);

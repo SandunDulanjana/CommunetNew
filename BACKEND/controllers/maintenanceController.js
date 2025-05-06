@@ -61,11 +61,11 @@ const displayAllMaintainRequests = async (req, res) => {
     }
 }
 
-const MaintainanceRequest = async (req, res) => {
+const MaintenanceRequest = async (req, res) => {
     try {
         const maintenanceId = req.params.id;
-        const MaintainanceRequest = await maintenanceModel.findById(maintenanceId)
-        return res.status(200).json({ success: true, MaintainanceRequest });
+        const maintenanceRequest = await maintenanceModel.findById(maintenanceId)
+        return res.status(200).json({ success: true, maintenanceRequest });
 
     } catch (error) {
         console.log(error);
@@ -141,4 +141,4 @@ const deleteMaintenanceRequest = async (req, res) => {
         return res.json({ success: false, massage: error.massage })
     }
 }
-export { addForm, displayAllMaintainRequests, MaintainanceRequest, updateForm, deleteMaintenanceRequest };
+export { addForm, displayAllMaintainRequests, MaintenanceRequest, updateForm, deleteMaintenanceRequest };
