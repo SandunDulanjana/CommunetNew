@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Footer from '../componenets/Footer';
 
 const AddMaintenance = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: "",
         phone: "",
@@ -13,6 +15,42 @@ const AddMaintenance = () => {
         priority: "",
         images: null,
     });
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('Please log in to submit a maintenance request');
+                    return;
+                }
+
+                const response = await axios.get(
+                    'http://localhost:5000/api/ProfileRouter/displayMember',
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                );
+
+                if (response.data.success) {
+                    const member = response.data.Member;
+                    setFormData(prev => ({
+                        ...prev,
+                        name: member.name || "",
+                        phone: member.phoneNumber || "",
+                        email: member.email || "",
+                        houseNo: member.houseNO || ""
+                    }));
+                }
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        };
+
+        fetchUserProfile();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -39,16 +77,8 @@ const AddMaintenance = () => {
 
             if (data.success) {
                 alert("Maintenance request submitted successfully!");
-                setFormData({
-                    name: "",
-                    phone: "",
-                    email: "",
-                    houseNo: "",
-                    category: "",
-                    details: "",
-                    priority: "",
-                    images: null,
-                });
+                // Redirect to MyMaintenance page
+                navigate('/MyMaintance');
             } else {
                 alert(`Failed to submit request: ${data.message}`);
             }

@@ -1,5 +1,4 @@
 import express from 'express';
-import multer from 'multer'; // Only required if you need custom configurations later
 import {
   addForm,
   displayAllMaintainRequests,
@@ -7,11 +6,11 @@ import {
   updateForm,
   deleteMaintenanceRequest
 } from '../controllers/maintenanceController.js';
-import upload from '../middlewares/multer.js'; // Reuse the upload middleware
+import upload from '../middlewares/multer.js';
 
 const maintenanceRouter = express.Router();
 
-// Use the `upload` middleware from '../middlewares/multer.js'
+// Use the `upload` middleware
 maintenanceRouter.post('/add-requestform', upload.single('images'), addForm);
 maintenanceRouter.get('/displayAllMaintenanceRequests', displayAllMaintainRequests);
 maintenanceRouter.get('/MaintenanceRequest/:id', MaintenanceRequest);
