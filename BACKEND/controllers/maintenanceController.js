@@ -151,7 +151,7 @@ const updateForm = async (req, res) => {
 
         // Log received data
         console.log('Body:', req.body);
-        console.log('Files:', req.files);
+        console.log('File:', req.file);
 
         const { name, phone, email, houseNo, category, details, priority } = req.body;
 
@@ -160,14 +160,42 @@ const updateForm = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Cannot update, Missing required fields' });
         }
 
+        // Get the current maintenance request
+        const currentRequest = await maintenanceModel.findById(maintenanceId);
+        if (!currentRequest) {
+            return res.status(404).json({ success: false, message: 'Maintenance request not found' });
+        }
+
         // Handle image upload
-        let imageUrls = [];
-        if (req.files && req.files.length > 0) {
-            for (const file of req.files) {
-                const uploadResponse = await cloudinary.uploader.upload(file.path, {
+        let imageUrl = currentRequest.images; // Keep existing image by default
+        if (req.file) {
+            try {
+                console.log('Uploading new image to Cloudinary...');
+                const uploadResponse = await cloudinary.uploader.upload(req.file.path, {
                     folder: 'maintenance_requests',
                 });
-                imageUrls.push(uploadResponse.secure_url);
+                console.log('Cloudinary upload successful:', uploadResponse.secure_url);
+                imageUrl = uploadResponse.secure_url;
+
+                // Delete the temporary file after successful upload
+                fs.unlink(req.file.path, (err) => {
+                    if (err) {
+                        console.error('Error deleting temporary file:', err);
+                    }
+                });
+            } catch (uploadError) {
+                console.error('Cloudinary upload error:', uploadError);
+                // Delete the temporary file if upload fails
+                fs.unlink(req.file.path, (err) => {
+                    if (err) {
+                        console.error('Error deleting temporary file:', err);
+                    }
+                });
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload image",
+                    error: uploadError.message 
+                });
             }
         }
 
@@ -177,7 +205,6 @@ const updateForm = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid phone number" });
         }
 
-
         const updatedData = {
             name,
             phone,
@@ -186,13 +213,23 @@ const updateForm = async (req, res) => {
             category,
             details,
             priority,
-            images: imageUrls.length ? imageUrls : undefined,
+            images: imageUrl // Always include the image URL (either new or existing)
         };
 
         // Update the maintenance request
-        await maintenanceModel.findByIdAndUpdate(maintenanceId, updatedData, { new: true });
+        const updatedRequest = await maintenanceModel.findByIdAndUpdate(
+            maintenanceId, 
+            updatedData, 
+            { new: true }
+        );
 
-        return res.status(200).json({ success: true, message: 'Maintenance details updated successfully' });
+        console.log('Updated maintenance request:', updatedRequest);
+
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Maintenance details updated successfully',
+            maintenanceRequest: updatedRequest
+        });
     } catch (error) {
         console.error('Error in updateForm:', error.message);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
