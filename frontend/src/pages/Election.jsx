@@ -17,6 +17,7 @@ const Election = () => {
 
   const fetchPolls = async () => {
     try {
+      setLoading(true);
       const response = await axios.get("http://localhost:5000/api/poll");
       setPolls(response.data);
       setLoading(false);
@@ -39,6 +40,7 @@ const Election = () => {
     }
 
     try {
+<<<<<<< Updated upstream
       await axios.post(
         `http://localhost:5000/api/poll/${pollId}/vote`,
         { optionIndex },
@@ -51,9 +53,85 @@ const Election = () => {
       setVotes({ ...votes, [pollId]: true });
       setSelectedOptions({ ...selectedOptions, [pollId]: optionIndex });
       fetchPolls(); // Refresh the polls to show updated results
+=======
+      // Log the request data
+      console.log('Sending vote request:', {
+        pollId,
+        optionIndex,
+        userId
+      });
+
+      // First verify the poll exists
+      const pollResponse = await axios.get(`http://localhost:5000/api/poll/${pollId}`);
+      const poll = pollResponse.data;
+
+      if (poll.closed) {
+        alert("This poll is closed.");
+        return;
+      }
+
+      // Check if user has already voted
+      if (poll.voters && poll.voters.includes(userId)) {
+        setVotes(prev => ({ ...prev, [pollId]: true }));
+        await fetchPolls();
+        return;
+      }
+
+      // Send the vote request
+      const response = await axios.post(
+        `http://localhost:5000/api/poll/${pollId}/vote`,
+        {
+          optionIndex: Number(optionIndex),
+          userId: userId
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      // Log the response
+      console.log('Vote response:', response.data);
+
+      if (response.data) {
+        // Update local state
+        setVotes(prev => ({ ...prev, [pollId]: true }));
+        setSelectedOptions(prev => ({ ...prev, [pollId]: optionIndex }));
+        
+        // Refresh the polls to show updated results
+        await fetchPolls();
+      }
+>>>>>>> Stashed changes
     } catch (error) {
-      console.error("Error voting:", error);
-      alert("Error submitting vote. Please try again.");
+      // Log detailed error information
+      console.error('Vote error details:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        request: {
+          url: error.config?.url,
+          method: error.config?.method,
+          data: error.config?.data
+        }
+      });
+
+      // Handle specific error cases
+      if (error.response?.status === 400) {
+        if (error.response?.data?.message === 'You have already voted.') {
+          setVotes(prev => ({ ...prev, [pollId]: true }));
+          await fetchPolls();
+          return;
+        }
+        if (error.response?.data?.message === 'Invalid user ID format') {
+          alert('Error: Invalid user ID. Please log in again.');
+          return;
+        }
+        alert(error.response.data.message || 'Error submitting vote');
+      } else {
+        alert('Error submitting vote. Please try again.');
+      }
     }
   };
 
