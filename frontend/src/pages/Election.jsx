@@ -17,6 +17,7 @@ const Election = () => {
 
   const fetchPolls = async () => {
     try {
+      setLoading(true);
       const response = await axios.get("http://localhost:5000/api/poll");
       setPolls(response.data);
       setLoading(false);
@@ -26,29 +27,111 @@ const Election = () => {
     }
   };
 
-  const votePoll = async (pollId, optionIndex) => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
+  const handleVote = async (pollId, optionIndex) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
       alert("Please log in to vote.");
       return;
     }
 
     if (votes[pollId]) {
-      alert("You have already voted!");
+      alert("You have already voted in this poll.");
       return;
     }
 
     try {
-      await axios.post(`http://localhost:5000/api/poll/${pollId}/vote`, {
-        optionIndex,
-        userId,
-      });
+<<<<<<< Updated upstream
+      await axios.post(
+        `http://localhost:5000/api/poll/${pollId}/vote`,
+        { optionIndex },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
       setVotes({ ...votes, [pollId]: true });
       setSelectedOptions({ ...selectedOptions, [pollId]: optionIndex });
       fetchPolls(); // Refresh the polls to show updated results
+=======
+      // Log the request data
+      console.log('Sending vote request:', {
+        pollId,
+        optionIndex,
+        userId
+      });
+
+      // First verify the poll exists
+      const pollResponse = await axios.get(`http://localhost:5000/api/poll/${pollId}`);
+      const poll = pollResponse.data;
+
+      if (poll.closed) {
+        alert("This poll is closed.");
+        return;
+      }
+
+      // Check if user has already voted
+      if (poll.voters && poll.voters.includes(userId)) {
+        setVotes(prev => ({ ...prev, [pollId]: true }));
+        await fetchPolls();
+        return;
+      }
+
+      // Send the vote request
+      const response = await axios.post(
+        `http://localhost:5000/api/poll/${pollId}/vote`,
+        {
+          optionIndex: Number(optionIndex),
+          userId: userId
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      // Log the response
+      console.log('Vote response:', response.data);
+
+      if (response.data) {
+        // Update local state
+        setVotes(prev => ({ ...prev, [pollId]: true }));
+        setSelectedOptions(prev => ({ ...prev, [pollId]: optionIndex }));
+        
+        // Refresh the polls to show updated results
+        await fetchPolls();
+      }
+>>>>>>> Stashed changes
     } catch (error) {
-      console.error("Error voting:", error);
-      alert("Error submitting vote. Please try again.");
+      // Log detailed error information
+      console.error('Vote error details:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        request: {
+          url: error.config?.url,
+          method: error.config?.method,
+          data: error.config?.data
+        }
+      });
+
+      // Handle specific error cases
+      if (error.response?.status === 400) {
+        if (error.response?.data?.message === 'You have already voted.') {
+          setVotes(prev => ({ ...prev, [pollId]: true }));
+          await fetchPolls();
+          return;
+        }
+        if (error.response?.data?.message === 'Invalid user ID format') {
+          alert('Error: Invalid user ID. Please log in again.');
+          return;
+        }
+        alert(error.response.data.message || 'Error submitting vote');
+      } else {
+        alert('Error submitting vote. Please try again.');
+      }
     }
   };
 
@@ -97,7 +180,7 @@ const Election = () => {
                                     ? 'border-blue-500 bg-blue-50'
                                     : 'border-gray-200 hover:border-blue-300'
                                 }`}
-                                onClick={() => !poll.closed && votePoll(poll._id, index)}
+                                onClick={() => !poll.closed && handleVote(poll._id, index)}
                               >
                                 <div className="flex justify-between items-center">
                                   <span className="text-gray-700">{option.optionText}</span>
