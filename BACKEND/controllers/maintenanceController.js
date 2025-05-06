@@ -2,6 +2,7 @@ import validator from "validator";
 import maintenanceModel from "../models/maintenanceModel.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from 'fs';
+import PDFDocument from 'pdfkit';
 
 const addForm = async (req, res) => {
     try {
@@ -379,4 +380,75 @@ const acceptRequest = async (req, res) => {
   }
 };
 
-export { addForm, displayAllMaintainRequests, MaintenanceRequest, updateForm, deleteMaintenanceRequest, rejectRequest, acceptRequest };
+// Generate maintenance report
+const generateReport = async (req, res) => {
+  try {
+    // Fetch all maintenance requests
+    const requests = await maintenanceModel.find().sort({ date: -1 });
+
+    // Create a new PDF document
+    const doc = new PDFDocument();
+    const filename = `maintenance_report_${new Date().toISOString().split('T')[0]}.pdf`;
+
+    // Set response headers for PDF download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+    // Pipe the PDF to the response
+    doc.pipe(res);
+
+    // Add title
+    doc.fontSize(20).text('Maintenance Requests Report', { align: 'center' });
+    doc.moveDown();
+
+    // Add date
+    doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: 'right' });
+    doc.moveDown();
+
+    // Add summary
+    const totalRequests = requests.length;
+    const acceptedRequests = requests.filter(req => req.status === 'accepted').length;
+    const rejectedRequests = requests.filter(req => req.status === 'rejected').length;
+    const pendingRequests = requests.filter(req => req.status === 'pending').length;
+
+    doc.fontSize(14).text('Summary', { underline: true });
+    doc.fontSize(12)
+      .text(`Total Requests: ${totalRequests}`)
+      .text(`Accepted Requests: ${acceptedRequests}`)
+      .text(`Rejected Requests: ${rejectedRequests}`)
+      .text(`Pending Requests: ${pendingRequests}`);
+    doc.moveDown();
+
+    // Add detailed request information
+    doc.fontSize(14).text('Detailed Request Information', { underline: true });
+    doc.moveDown();
+
+    requests.forEach((request, index) => {
+      doc.fontSize(12)
+        .text(`Request #${index + 1}`, { underline: true })
+        .text(`Name: ${request.name}`)
+        .text(`Email: ${request.email}`)
+        .text(`Phone: ${request.phone}`)
+        .text(`House Number: ${request.houseNo}`)
+        .text(`Category: ${request.category}`)
+        .text(`Priority: ${request.priority}`)
+        .text(`Status: ${request.status}`)
+        .text(`Date: ${new Date(request.date).toLocaleDateString()}`)
+        .text(`Description: ${request.details}`);
+
+      if (request.status === 'rejected' && request.rejectionReason) {
+        doc.text(`Rejection Reason: ${request.rejectionReason}`);
+      }
+
+      doc.moveDown();
+    });
+
+    // Finalize the PDF
+    doc.end();
+  } catch (error) {
+    console.error('Error generating report:', error);
+    res.status(500).json({ success: false, message: 'Error generating report', error: error.message });
+  }
+};
+
+export { addForm, displayAllMaintainRequests, MaintenanceRequest, updateForm, deleteMaintenanceRequest, rejectRequest, acceptRequest, generateReport };

@@ -6,7 +6,8 @@ import {
   updateForm,
   deleteMaintenanceRequest,
   rejectRequest,
-  acceptRequest
+  acceptRequest,
+  generateReport
 } from '../controllers/maintenanceController.js';
 import upload from '../middlewares/multer.js';
 
@@ -20,5 +21,6 @@ maintenanceRouter.put('/UpdateMaintenanceRequest/:id', upload.single('images'), 
 maintenanceRouter.delete('/DeleteMaintenanceRequest/:id', deleteMaintenanceRequest);
 maintenanceRouter.post('/reject/:id', rejectRequest);
 maintenanceRouter.post('/accept/:id', acceptRequest);
+maintenanceRouter.get('/generate-report', generateReport);
 
 export default maintenanceRouter;

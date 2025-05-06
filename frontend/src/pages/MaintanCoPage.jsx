@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Footer from '../componenets/Footer';
+import { FaDownload } from 'react-icons/fa';
 
 function MaintanCoPage() {
   const [requests, setRequests] = useState([]);
@@ -20,6 +21,7 @@ function MaintanCoPage() {
   const [selectedRequestId, setSelectedRequestId] = useState(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [generatingReport, setGeneratingReport] = useState(false);
 
   useEffect(() => {
     const fetchMaintenance = async () => {
@@ -82,7 +84,7 @@ function MaintanCoPage() {
       );
 
       if (response.data.success) {
-        // Remove the accepted request from the list
+        // Remove the accepted request from both lists
         setRequests(prevRequests => 
           prevRequests.filter(request => request._id !== id)
         );
@@ -144,6 +146,40 @@ function MaintanCoPage() {
     setRejectionReason('');
   };
 
+  const handleGenerateReport = async () => {
+    try {
+      setGeneratingReport(true);
+      const response = await axios.get(
+        'http://localhost:5000/api/maintenance/generate-report',
+        { responseType: 'blob' }
+      );
+
+      // Create a blob from the PDF data
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(blob);
+      
+      // Create a temporary link element
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `maintenance_report_${new Date().toISOString().split('T')[0]}.pdf`;
+      
+      // Append link to body, click it, and remove it
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up the URL
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating report:', error);
+      alert('Failed to generate report. Please try again.');
+    } finally {
+      setGeneratingReport(false);
+    }
+  };
+
   if (isLoading) {
     return <div>Loading maintenance requests...</div>; // Show loading message
   }
@@ -154,7 +190,17 @@ function MaintanCoPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
-      <h2 className="text-2xl font-bold mb-4">Maintenance Requests</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-800">Maintenance Requests</h1>
+        <button
+          onClick={handleGenerateReport}
+          disabled={generatingReport}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50"
+        >
+          <FaDownload />
+          {generatingReport ? 'Generating...' : 'Generate Report'}
+        </button>
+      </div>
 
       {/* Filter Section */}
       <div className="bg-white p-4 rounded-lg shadow mb-6">
