@@ -9,50 +9,63 @@ const MyMaintenance = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const fetchMaintenance = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          setError("Please log in to view your maintenance requests");
-          setLoading(false);
-          return;
-        }
-
-        // Fetch all maintenance requests with authentication
-        const response = await axios.get(
-          "http://localhost:5000/api/maintenance/displayAllMaintenanceRequests",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
-        console.log("Response:", response);
-
-        if (response.data.success) {
-          // Get user email from the token
-          const decodedToken = JSON.parse(atob(token.split('.')[1]));
-          const userEmail = decodedToken.email;
-
-          // Filter requests for the logged-in user
-          const userRequests = response.data.AllMaintainanceRequests.filter(
-            request => request.email === userEmail
-          );
-          setMaintenance(userRequests);
-        } else {
-          setError(response.data.message || "Failed to fetch data.");
-        }
-      } catch (error) {
-        console.error("Error fetching maintenance:", error);
-        setError("Failed to load maintenance data. Please try again later.");
-      } finally {
+  const fetchMaintenance = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError("Please log in to view your maintenance requests");
         setLoading(false);
+        return;
       }
-    };
 
+      // Fetch all maintenance requests with authentication
+      const response = await axios.get(
+        "http://localhost:5000/api/maintenance/displayAllMaintenanceRequests",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      console.log('Maintenance response:', response.data); // Debug log
+
+      if (response.data.success) {
+        // Get user email from the token
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        const userEmail = decodedToken.email;
+
+        // Filter requests for the logged-in user and ensure status is set
+        const userRequests = response.data.AllMaintainanceRequests
+          .filter(request => request.email === userEmail)
+          .map(request => ({
+            ...request,
+            status: request.status || 'pending',
+            rejectionReason: request.rejectionReason || ''
+          }));
+        
+        console.log('Filtered user requests:', userRequests); // Debug log
+        setMaintenance(userRequests);
+      } else {
+        setError(response.data.message || "Failed to fetch data.");
+      }
+    } catch (error) {
+      console.error("Error fetching maintenance:", error);
+      setError("Failed to load maintenance data. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchMaintenance();
   }, []);
+
+  // Add refresh function
+  const refreshMaintenance = () => {
+    setLoading(true);
+    fetchMaintenance();
+  };
 
   const handleEdit = (id) => {
     navigate(`/EditMaintenance/${id}`);
@@ -131,6 +144,7 @@ const MyMaintenance = () => {
                   <th className="p-2 border">Description</th>
                   <th className="p-2 border">Priority</th>
                   <th className="p-2 border">Image</th>
+                  <th className="p-2 border">Status</th>
                   <th className="p-2 border">Actions</th>
                 </tr>
               </thead>
@@ -155,6 +169,23 @@ const MyMaintenance = () => {
                       ) : (
                         "No Image"
                       )}
+                    </td>
+                    <td className="p-2 border">
+                      <div className="flex flex-col">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                          request.status === 'accepted' ? 'bg-green-100 text-green-800' :
+                          request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {request.status || 'pending'}
+                        </span>
+                        {request.status === 'rejected' && request.rejectionReason && (
+                          <div className="mt-1 text-xs text-red-600">
+                            <span className="font-semibold">Reason:</span> {request.rejectionReason}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="p-2 border">
                       <button

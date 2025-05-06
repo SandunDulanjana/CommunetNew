@@ -123,7 +123,12 @@ const addForm = async (req, res) => {
 
 const displayAllMaintainRequests = async (req, res) => {
     try {
-        const AllMaintainanceRequests = await maintenanceModel.find()
+        const AllMaintainanceRequests = await maintenanceModel.find().select('+status +rejectionReason');
+        console.log('Found maintenance requests:', AllMaintainanceRequests.map(req => ({
+            id: req._id,
+            status: req.status,
+            rejectionReason: req.rejectionReason
+        })));
         return res.status(200).json({ success: true, AllMaintainanceRequests });
 
     } catch (error) {
@@ -153,17 +158,40 @@ const updateForm = async (req, res) => {
         console.log('Body:', req.body);
         console.log('File:', req.file);
 
-        const { name, phone, email, houseNo, category, details, priority } = req.body;
-
-        // Validate required fields
-        if (!name || !phone || !email || !houseNo || !category || !details || !priority) {
-            return res.status(400).json({ success: false, message: 'Cannot update, Missing required fields' });
-        }
+        const { name, phone, email, houseNo, category, details, priority, status, rejectionReason } = req.body;
 
         // Get the current maintenance request
         const currentRequest = await maintenanceModel.findById(maintenanceId);
         if (!currentRequest) {
             return res.status(404).json({ success: false, message: 'Maintenance request not found' });
+        }
+
+        // If this is a rejection update
+        if (status === 'rejected') {
+            if (!rejectionReason) {
+                return res.status(400).json({ success: false, message: 'Rejection reason is required' });
+            }
+
+            const updatedRequest = await maintenanceModel.findByIdAndUpdate(
+                maintenanceId,
+                {
+                    status: 'rejected',
+                    rejectionReason,
+                    updatedAt: Date.now()
+                },
+                { new: true }
+            );
+
+            return res.status(200).json({
+                success: true,
+                message: 'Request rejected successfully',
+                maintenanceRequest: updatedRequest
+            });
+        }
+
+        // For regular updates, validate required fields
+        if (!name || !phone || !email || !houseNo || !category || !details || !priority) {
+            return res.status(400).json({ success: false, message: 'Cannot update, Missing required fields' });
         }
 
         // Handle image upload
@@ -249,4 +277,106 @@ const deleteMaintenanceRequest = async (req, res) => {
         return res.json({ success: false, massage: error.massage })
     }
 }
-export { addForm, displayAllMaintainRequests, MaintenanceRequest, updateForm, deleteMaintenanceRequest };
+
+// Reject maintenance request
+const rejectRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rejectionReason } = req.body;
+
+    console.log('Rejecting request:', { id, rejectionReason });
+
+    if (!rejectionReason) {
+      return res.status(400).json({ success: false, message: 'Rejection reason is required' });
+    }
+
+    // Find the request first to ensure it exists
+    const request = await maintenanceModel.findById(id);
+    if (!request) {
+      return res.status(404).json({ success: false, message: 'Maintenance request not found' });
+    }
+
+    console.log('Current request status:', request.status);
+
+    // Update the request with rejection status and reason
+    const updatedRequest = await maintenanceModel.findByIdAndUpdate(
+      id,
+      { 
+        $set: {
+          status: 'rejected',
+          rejectionReason: rejectionReason,
+          updatedAt: Date.now()
+        }
+      },
+      { new: true, runValidators: true }
+    );
+
+    console.log('Updated request:', {
+      id: updatedRequest._id,
+      status: updatedRequest.status,
+      rejectionReason: updatedRequest.rejectionReason
+    });
+
+    if (!updatedRequest) {
+      return res.status(500).json({ success: false, message: 'Failed to update request' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Request rejected successfully',
+      request: updatedRequest
+    });
+  } catch (error) {
+    console.error('Error rejecting request:', error);
+    res.status(500).json({ success: false, message: 'Error rejecting request', error: error.message });
+  }
+};
+
+// Accept maintenance request
+const acceptRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log('Accepting request:', { id });
+
+    // Find the request first to ensure it exists
+    const request = await maintenanceModel.findById(id);
+    if (!request) {
+      return res.status(404).json({ success: false, message: 'Maintenance request not found' });
+    }
+
+    console.log('Current request status:', request.status);
+
+    // Update the request with accepted status
+    const updatedRequest = await maintenanceModel.findByIdAndUpdate(
+      id,
+      { 
+        $set: {
+          status: 'accepted',
+          updatedAt: Date.now()
+        }
+      },
+      { new: true, runValidators: true }
+    );
+
+    console.log('Updated request:', {
+      id: updatedRequest._id,
+      status: updatedRequest.status
+    });
+
+    if (!updatedRequest) {
+      return res.status(500).json({ success: false, message: 'Failed to update request' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Request accepted successfully',
+      request: updatedRequest
+    });
+  } catch (error) {
+    console.error('Error accepting request:', error);
+    res.status(500).json({ success: false, message: 'Error accepting request', error: error.message });
+  }
+};
+
+export { addForm, displayAllMaintainRequests, MaintenanceRequest, updateForm, deleteMaintenanceRequest, rejectRequest, acceptRequest };
