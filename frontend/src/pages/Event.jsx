@@ -160,7 +160,7 @@ const Event = () => {
               </div>
             </div>
             {selectedEvent.requestType === 'Request to Join' && (
-              <div className="flex justify-end mt-6">
+              <div className="flex justify-end mt-6 space-x-2">
                 <button
                   className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition"
                   onClick={() => {
@@ -169,6 +169,15 @@ const Event = () => {
                   }}
                 >
                   Request to Join Event
+                </button>
+                <button
+                  className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition"
+                  onClick={() => {
+                    setShowEventDetails(false);
+                    navigate(`/event-qr/${selectedEvent._id}`);
+                  }}
+                >
+                  Show Attendance QR
                 </button>
               </div>
             )}
