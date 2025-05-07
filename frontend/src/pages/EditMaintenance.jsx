@@ -13,16 +13,19 @@ const EditMaintenance = () => {
     category: '',
     details: '',
     priority: '',
-    images: [],
+    images: '',
   });
-  const [selectedImages, setSelectedImages] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [currentImage, setCurrentImage] = useState('');
 
   // Fetch maintenance request details
   useEffect(() => {
     const fetchMaintenance = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/maintenance/MaintainanceRequest/${id}`);
-        setMaintenance(response.data.MaintainanceRequest);
+        const response = await axios.get(`http://localhost:5000/api/maintenance/MaintenanceRequest/${id}`);
+        const data = response.data.maintenanceRequest;
+        setMaintenance(data);
+        setCurrentImage(data.images || '');
       } catch (error) {
         console.error('Error fetching maintenance:', error);
       }
@@ -40,7 +43,9 @@ const EditMaintenance = () => {
   };
 
   const handleFileChange = (e) => {
-    setSelectedImages([...e.target.files]); // Store selected files
+    if (e.target.files && e.target.files[0]) {
+      setSelectedImage(e.target.files[0]);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -49,46 +54,52 @@ const EditMaintenance = () => {
     try {
       const formDataObj = new FormData();
 
+      // Add all maintenance data to FormData
       Object.keys(maintenance).forEach((key) => {
-        formDataObj.append(key, maintenance[key]);
+        if (key !== 'images') { // Don't append the old image URL
+          formDataObj.append(key, maintenance[key]);
+        }
       });
 
-      // Append selected images to FormData
-      // Array.from(selectedImages).forEach((file) => {
-      //   maintenance.append('images', file);
-      // });
+      // Append new image if selected
+      if (selectedImage) {
+        formDataObj.append('images', selectedImage);
+      }
+
+      console.log('Sending form data:', {
+        name: maintenance.name,
+        phone: maintenance.phone,
+        email: maintenance.email,
+        houseNo: maintenance.houseNo,
+        category: maintenance.category,
+        details: maintenance.details,
+        priority: maintenance.priority,
+        hasNewImage: !!selectedImage,
+        currentImage: currentImage
+      });
 
       // Make the PUT request to update the maintenance request
       const { data } = await axios.put(
-        `http://localhost:5000/api/maintenance/UpdateMaintainanceRequest/${id}`,
+        `http://localhost:5000/api/maintenance/UpdateMaintenanceRequest/${id}`,
         formDataObj,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        { 
+          headers: { 
+            'Content-Type': 'multipart/form-data'
+          }
+        }
       );
 
       if (data.success) {
         alert('Maintenance request updated successfully');
-        // setFormData({
-        //   name: "",
-        //   phone: "",
-        //   email: "",
-        //   houseNo: "",
-        //   category: "",
-        //   details: "",
-        //   priority: "",
-        //   images: null,
-        // });
+        navigate('/MyMaintance');
       } else {
         alert(`Failed to submit request: ${data.message}`);
       }
-
-
-      navigate('/');
     } catch (error) {
       console.error('Error updating maintenance:', error.response?.data || error.message);
       alert('Error updating maintenance request');
     }
   };
-
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
@@ -206,19 +217,42 @@ const EditMaintenance = () => {
             </div>
           </div>
 
-
-
-          {/* Image Upload */}
+          {/* Image Upload and Preview */}
           <div className="mb-4">
-            <label className="block">Upload Images:</label>
+            <label className="block">Current Image:</label>
+            {currentImage && (
+              <div className="mt-2 mb-4">
+                <img 
+                  src={currentImage} 
+                  alt="Current maintenance" 
+                  className="w-32 h-32 object-cover rounded-lg"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/default-image.png';
+                  }}
+                />
+              </div>
+            )}
+            <label className="block mt-2">Upload New Image:</label>
             <input
               type="file"
               name="images"
-              multiple
               onChange={handleFileChange}
               className="w-full p-2 border border-gray-300 rounded"
+              accept="image/*"
             />
+            {selectedImage && (
+              <div className="mt-2">
+                <p className="text-sm text-gray-600">New image selected: {selectedImage.name}</p>
+                <img 
+                  src={URL.createObjectURL(selectedImage)} 
+                  alt="Selected maintenance" 
+                  className="w-32 h-32 object-cover rounded-lg mt-2"
+                />
+              </div>
+            )}
           </div>
+
           <button
             type="submit"
             className="bg-blue-500 text-white px-6 py-2 rounded-2xl shadow-lg hover:bg-blue-600 transition w-full"

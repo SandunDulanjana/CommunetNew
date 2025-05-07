@@ -11,9 +11,9 @@ config();
 import connect_DB from './config/mongodb.js';
 import connectCloudinary from './config/cloudinary.js';
 import memberRouter from './routes/memberRoute.js';
-import maintenanceRoute from '../BACKEND/routes/maintenanceRoute.js';
-import userRouter from '../BACKEND/routes/UserRoute.js';
-import eventRouter from '../BACKEND/routes/eventRoute.js';
+import maintenanceRoute from './routes/maintenanceRoute.js';
+import userRouter from './routes/UserRoute.js';
+import eventRouter from './routes/eventRoute.js';
 import announcementRouter from './routes/annoucemntRouter.js';
 import ruleRoutes from './routes/ruleRoutes.js';
 import expenseRouter from '../BACKEND/routes/expenseRouter.js';
@@ -43,7 +43,7 @@ app.use((err, req, res, next) => {
 
 //api endpoints
 app.use('/api/member', memberRouter);
-app.use('/api/maintenace', maintenanceRoute);
+app.use('/api/maintenance', maintenanceRoute);
 app.use('/api/user', userRouter);
 app.use('/api/announcement', announcementRouter);
 app.use('/api/rules', ruleRoutes);

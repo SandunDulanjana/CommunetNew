@@ -1,21 +1,26 @@
 import express from 'express';
-import multer from 'multer'; // Only required if you need custom configurations later
 import {
   addForm,
   displayAllMaintainRequests,
-  MaintainanceRequest,
+  MaintenanceRequest,
   updateForm,
-  deleteMaintenanceRequest
+  deleteMaintenanceRequest,
+  rejectRequest,
+  acceptRequest,
+  generateReport
 } from '../controllers/maintenanceController.js';
-import upload from '../middlewares/multer.js'; // Reuse the upload middleware
+import upload from '../middlewares/multer.js';
 
 const maintenanceRouter = express.Router();
 
-// Use the `upload` middleware from '../middlewares/multer.js'
+// Use the `upload` middleware
 maintenanceRouter.post('/add-requestform', upload.single('images'), addForm);
-maintenanceRouter.get('/displayAllMaintainRequests', displayAllMaintainRequests);
-maintenanceRouter.get('/MaintainanceRequest/:id', MaintainanceRequest);
-maintenanceRouter.put('/UpdateMaintainanceRequest/:id', upload.single('images'), updateForm);
-maintenanceRouter.delete('/DeleteMaintainanceRequest/:id', deleteMaintenanceRequest);
+maintenanceRouter.get('/displayAllMaintenanceRequests', displayAllMaintainRequests);
+maintenanceRouter.get('/MaintenanceRequest/:id', MaintenanceRequest);
+maintenanceRouter.put('/UpdateMaintenanceRequest/:id', upload.single('images'), updateForm);
+maintenanceRouter.delete('/DeleteMaintenanceRequest/:id', deleteMaintenanceRequest);
+maintenanceRouter.post('/reject/:id', rejectRequest);
+maintenanceRouter.post('/accept/:id', acceptRequest);
+maintenanceRouter.get('/generate-report', generateReport);
 
 export default maintenanceRouter;
