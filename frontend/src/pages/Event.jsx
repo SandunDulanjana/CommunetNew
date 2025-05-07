@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../componenets/Footer';
 import axios from 'axios';
@@ -9,10 +9,10 @@ const Event = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showRequestModal, setShowRequestModal] = useState(false);
+  const [showEventDetails, setShowEventDetails] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [requestMessage, setRequestMessage] = useState('');
   const [requestStatus, setRequestStatus] = useState('');
-  const eventDetailRef = useRef(null); 
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -32,16 +32,17 @@ const Event = () => {
     fetchEvents();
   }, []);
 
-  // Handle clicking an event box
+  // Handle clicking an event card
   const handleEventClick = (event) => {
     setSelectedEvent(event);
-    eventDetailRef.current.scrollIntoView({ behavior: 'smooth' });
+    setShowEventDetails(true);
   };
 
   // Handle the Request button click
   const handleRequestClick = (event) => {
     setSelectedEvent(event);
     setShowRequestModal(true);
+    setShowEventDetails(false); // Close event details when opening request form
   };
 
   const handleRequestSubmit = async () => {
@@ -82,12 +83,6 @@ const Event = () => {
     }
   };
 
-  const handleGetQR = () => {
-    if (selectedEvent && selectedEvent._id) {
-      navigate(`/qr/${selectedEvent._id}`);
-    }
-  };
-
   if (loading) return <div className="p-4">Loading events...</div>;
   if (error) return <div className="p-4 text-red-500">{error}</div>;
 
@@ -121,28 +116,29 @@ const Event = () => {
             <p className="text-gray-700 mb-1"><span className="font-semibold">Organizer:</span> {event.organizarName}</p>
             <p className="text-gray-600 mb-1">{event.date} | {event.time}</p>
             <p className="text-gray-600 mb-2"><span className="font-semibold">Venue:</span> {event.venue}</p>
+            <p className="text-gray-600 mb-2 line-clamp-2"><span className="font-semibold">Description:</span> {event.discription}</p>
             {event.requestType === 'Request to Join' && (
               <button 
                 className="mt-auto bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation();
                   handleRequestClick(event);
                 }}
               >
-                Request
+                Request to Join Event
               </button>
             )}
           </div>
         ))}
       </div>
 
-      {/* Event Details */}
-      {selectedEvent && (
-        <div ref={eventDetailRef} className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+      {/* Event Details Modal */}
+      {showEventDetails && selectedEvent && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl relative">
             <button
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl"
-              onClick={() => setSelectedEvent(null)}
+              onClick={() => setShowEventDetails(false)}
               aria-label="Close"
             >
               &times;
@@ -163,14 +159,19 @@ const Event = () => {
                 <p className="mb-2"><span className="font-semibold">Request Type:</span> {selectedEvent.requestType}</p>
               </div>
             </div>
-            <div className="flex justify-end mt-6">
-              <button
-                className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition"
-                onClick={handleGetQR}
-              >
-                Get QR
-              </button>
-            </div>
+            {selectedEvent.requestType === 'Request to Join' && (
+              <div className="flex justify-end mt-6">
+                <button
+                  className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition"
+                  onClick={() => {
+                    setShowEventDetails(false);
+                    handleRequestClick(selectedEvent);
+                  }}
+                >
+                  Request to Join Event
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -180,13 +181,18 @@ const Event = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
             <h2 className="text-xl font-bold mb-4 text-blue-700">Request to Join Event</h2>
-            <p className="mb-4 text-gray-700">Event: <span className="font-semibold">{selectedEvent.eventName}</span></p>
+            <div className="mb-4">
+              <h3 className="font-semibold text-gray-800">{selectedEvent.eventName}</h3>
+              <p className="text-sm text-gray-600">{selectedEvent.date} | {selectedEvent.time}</p>
+              <p className="text-sm text-gray-600">Venue: {selectedEvent.venue}</p>
+            </div>
             <textarea
               value={requestMessage}
               onChange={e => setRequestMessage(e.target.value)}
-              placeholder="Enter your message..."
+              placeholder="Enter your message to the organizer..."
               className="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
               rows="4"
+              required
             />
             {requestStatus && (
               <div className={`mb-4 p-2 rounded ${
@@ -209,6 +215,7 @@ const Event = () => {
               <button
                 onClick={handleRequestSubmit}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                disabled={!requestMessage.trim()}
               >
                 Send Request
               </button>

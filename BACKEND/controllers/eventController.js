@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import eventRequestModel from '../models/eventRequestModel.js';
 import { sendRequestNotificationEmail, sendRequestStatusEmail } from '../services/emailService.js';
 import memberModel from '../models/memberModel.js';
+import { useState } from 'react';
 
 
 //API for add user data
@@ -38,6 +39,35 @@ const addEvent = async(req,res) => {
 
         if(discription.length > 1000){
             return res.json({success:false, message: "Discriptin length is too long"});
+        }
+
+        // Check for date+venue conflict with approved events
+        const conflict = await eventModel.findOne({
+            date: date,
+            venue: venue,
+            status: 'Approved'
+        });
+        if (conflict) {
+            return res.json({
+                success: false,
+                message: "An approved event already exists for this date and venue. Please choose a different date or venue."
+            });
+        }
+
+        // Check if venue is "At home" and validate house number
+        if (venue.startsWith('At home - ')) {
+            const houseNumber = venue.split(' - ')[1];
+            const existingEvent = await eventModel.findOne({
+                venue: { $regex: new RegExp(`^At home - ${houseNumber}$`, 'i') },
+                status: 'Approved'
+            });
+
+            if (existingEvent) {
+                return res.json({
+                    success: false,
+                    message: "This house number is already booked for an approved event. Please choose a different house number."
+                });
+            }
         }
 
         const eventData = {
@@ -83,57 +113,24 @@ const displayAllEvent = async (req, res) => {
     }
 }  
 
-const displaySingleEvent = async (req,res) => {
-    try{
-        // Get token from request headers
+const displaySingleEvent = async (req, res) => {
+    try {
         const token = req.headers.authorization?.split(' ')[1];
-        console.log("DisplaySingleEvent - Received token:", token);
-        
         if (!token) {
             return res.json({success: false, message: "No token provided"});
         }
-
-        // Verify token and get user ID
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.id;
-        console.log("DisplaySingleEvent - Decoded user ID:", userId);
-        console.log("DisplaySingleEvent - Full decoded token:", decoded);
 
-        // First, let's check if there are any events in the database
-        const allEvents = await eventModel.find({});
-        console.log("DisplaySingleEvent - All events in database:", JSON.stringify(allEvents, null, 2));
+        // Only return events created by this user
+        const userEvents = await eventModel.find({ userId: userId.toString() });
 
-        // Try different ways to find events for this user
-        const queries = [
-            { userId: userId },
-            { userId: userId.toString() },
-            { userId: { $regex: new RegExp(userId, 'i') } },
-            { userId: { $exists: true } }
-        ];
-
-        for (const query of queries) {
-            console.log(`DisplaySingleEvent - Trying query:`, query);
-            const events = await eventModel.find(query);
-            console.log(`DisplaySingleEvent - Results for query:`, JSON.stringify(events, null, 2));
-        }
-
-        // Return all events for now to see what's in the database
         return res.json({
             success: true, 
-            event: allEvents,
-            debug: {
-                userId,
-                totalEvents: allEvents.length,
-                queries: queries.map(q => ({
-                    query: q,
-                    count: allEvents.filter(e => e.userId === userId).length
-                }))
-            }
+            event: userEvents
         });
-
-    }catch(error){
-        console.log("DisplaySingleEvent - Error:", error);
-        res.json({success: false, message: error.message})
+    } catch(error) {
+        res.json({ success: false, message: error.message })
     }
 }
 
@@ -155,7 +152,7 @@ const deleteEvent= async (req,res) => {
 const updateEvent = async (req, res) => {
     try {
         const eventId = req.params.id;
-        const { status } = req.body;
+        const updateData = req.body;
 
         // Get the current event
         const currentEvent = await eventModel.findById(eventId);
@@ -163,25 +160,112 @@ const updateEvent = async (req, res) => {
             return res.json({ success: false, message: "Event not found" });
         }
 
-        // Update the event status
+        // If status is being updated to Approved or Rejected, skip full validation
+        if (updateData.status && (updateData.status === 'Approved' || updateData.status === 'Rejected')) {
+            console.log('Processing status update:', {
+                eventId,
+                newStatus: updateData.status,
+                currentStatus: currentEvent.status
+            });
+
+            // Update with all fields from updateData, not just status
+            const updatedEvent = await eventModel.findByIdAndUpdate(
+                eventId,
+                updateData,
+                { new: true }
+            );
+
+            console.log('Event updated in database:', {
+                eventId: updatedEvent._id,
+                status: updatedEvent.status,
+                organizerEmail: updatedEvent.organizarEmail
+            });
+
+            // Send email notification if status changed
+            if (updateData.status !== currentEvent.status) {
+                try {
+                    if (updateData.status === 'Approved') {
+                        console.log('Sending approval email...');
+                        await sendApprovalEmail(updatedEvent);
+                    } else if (updateData.status === 'Rejected') {
+                        console.log('Sending rejection email...');
+                        await sendRejectionEmail(updatedEvent, updateData.reason);
+                    }
+                } catch (emailError) {
+                    console.error('Failed to send email notification:', emailError);
+                    // Continue with the response even if email fails
+                }
+            }
+
+            return res.json({
+                success: true,
+                message: "Event status updated successfully",
+                event: updatedEvent
+            });
+        }
+
+        // Otherwise, do full validation
+        // Validate required fields
+        const requiredFields = ['eventName', 'organizarName', 'discription', 'date', 'time', 
+                              'venue', 'organizarContactNo', 'organizarEmail', 'expectedCount', 'requestType'];
+        
+        for (const field of requiredFields) {
+            if (!updateData[field]) {
+                return res.json({ success: false, message: `${field} is required` });
+            }
+        }
+
+        // Validate email
+        if (!validator.isEmail(updateData.organizarEmail)) {
+            return res.json({ success: false, message: "Please enter valid email" });
+        }
+
+        // Validate phone number
+        if (!(updateData.organizarContactNo.length === 10)) {
+            return res.json({ success: false, message: "Contact number must be 10 digits" });
+        }
+
+        // Validate description length
+        if (updateData.discription.length > 1000) {
+            return res.json({ success: false, message: "Description length is too long" });
+        }
+
+        // Check if venue is "At home" and validate house number
+        if (updateData.venue.startsWith('At home - ')) {
+            const houseNumber = updateData.venue.split(' - ')[1];
+            const existingEvent = await eventModel.findOne({
+                venue: { $regex: new RegExp(`^At home - ${houseNumber}$`, 'i') },
+                status: 'Approved',
+                _id: { $ne: eventId } // Exclude current event from check
+            });
+
+            if (existingEvent) {
+                return res.json({
+                    success: false,
+                    message: "This house number is already booked for an approved event. Please choose a different house number."
+                });
+            }
+        }
+
+        // Update the event with all fields
         const updatedEvent = await eventModel.findByIdAndUpdate(
             eventId,
-            { status },
-            { new: true }
+            updateData,
+            { new: true, runValidators: true }
         );
 
-        // Send email notification based on status
-        if (status === 'Approved') {
-            await sendApprovalEmail(updatedEvent);
-            console.log(`Approval email sent to ${updatedEvent.organizarEmail}`);
-        } else if (status === 'Rejected') {
-            await sendRejectionEmail(updatedEvent);
-            console.log(`Rejection email sent to ${updatedEvent.organizarEmail}`);
+        // Send email notification if status changed
+        if (updateData.status && updateData.status !== currentEvent.status) {
+            if (updateData.status === 'Approved') {
+                await sendApprovalEmail(updatedEvent);
+            } else if (updateData.status === 'Rejected') {
+                await sendRejectionEmail(updatedEvent, updateData.reason);
+            }
         }
 
         return res.json({ 
             success: true, 
-            message: `Event ${status.toLowerCase()} successfully`,
+            message: "Event updated successfully",
             event: updatedEvent 
         });
     } catch (error) {

@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { jwtDecode } from "jwt-decode";
 import axios from 'axios';
 import Footer from '../componenets/Footer';
+import { useNavigate } from 'react-router-dom';
 
 const AddEvent = () => {
     const [eventName, setEventName] = useState('');
@@ -9,11 +11,27 @@ const AddEvent = () => {
     const [date, setDate] = useState('');
     const [time, setStartTime] = useState('');
     const [venue, setVenue] = useState('');
+    const [houseNumber, setHouseNumber] = useState('');
     const [organizarContactNo, setOrganizarContactNo] = useState('');
     const [organizarEmail, setOrganizarEmail] = useState('');
     const [expectedCount, setExpectedCount] = useState(0);
     const [requestType, setRequestType] = useState(''); 
     const [error, setError] = useState('');
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            try {
+                const decoded = jwtDecode(token);
+                if (decoded && decoded.email) {
+                    setOrganizarEmail(decoded.email);
+                }
+            } catch (err) {
+                // Invalid token, do nothing
+            }
+        }
+    }, []);
 
     const onSubmitHandler = async (e) => {
         e.preventDefault();
@@ -32,6 +50,13 @@ const AddEvent = () => {
             setError("");
         }
 
+        if (venue === 'At home' && !houseNumber.trim()) {
+            alert('Please enter house number');
+            return;
+        }
+
+        const finalVenue = venue === 'At home' ? `At home - ${houseNumber}` : venue;
+
         try {
             const formData = {
                 eventName,
@@ -39,7 +64,7 @@ const AddEvent = () => {
                 discription,
                 date,
                 time,
-                venue,
+                venue: finalVenue,
                 organizarContactNo,
                 organizarEmail,
                 expectedCount,
@@ -47,7 +72,6 @@ const AddEvent = () => {
                 status: 'Pending'
             };
 
-            console.log("AddEvent - Form data being sent:", formData);
 
             const response = await axios.post(
                 "http://localhost:5000/api/event/add-event",
@@ -58,10 +82,11 @@ const AddEvent = () => {
                     }
                 }
             );
-            console.log("AddEvent - Response from server:", response.data);
             
             if (response.data.success) {
+
                 alert("Event added successfully!");
+                
                 // Clear form fields
                 setEventName('');
                 setOrganizarName('');
@@ -69,10 +94,12 @@ const AddEvent = () => {
                 setDate('');
                 setStartTime('');
                 setVenue('');
+                setHouseNumber('');
                 setOrganizarContactNo('');
                 setOrganizarEmail('');
                 setExpectedCount(0);
                 setRequestType('');
+                navigate('/MyEvents');
             } else {
                 alert(response.data.message || "Failed to add event");
             }
@@ -154,16 +181,35 @@ const AddEvent = () => {
 
                     <label className="block mb-4">
                         <span className="text-gray-700">Venue:</span>
-                        <input
+                        <select
                             name="venue"
-                            type="text"
-                            onChange={(e) => setVenue(e.target.value)}
                             value={venue}
+                            onChange={(e) => setVenue(e.target.value)}
                             required
-                            placeholder="Enter event venue"
                             className="mt-1 p-2 w-full border rounded-md"
-                        />
+                        >
+                            <option value="">Select venue</option>
+                            <option value="Pool area">Pool area</option>
+                            <option value="Rooftop">Rooftop</option>
+                            <option value="Play ground">Play ground</option>
+                            <option value="Common hall">Common hall</option>
+                            <option value="At home">At home</option>
+                        </select>
                     </label>
+
+                    {venue === 'At home' && (
+                        <label className="block mb-4">
+                            <span className="text-gray-700">House Number:</span>
+                            <input
+                                type="text"
+                                value={houseNumber}
+                                onChange={(e) => setHouseNumber(e.target.value)}
+                                required
+                                placeholder="Enter house number"
+                                className="mt-1 p-2 w-full border rounded-md"
+                            />
+                        </label>
+                    )}
 
                     <label className="block mb-4">
                         <span className="text-gray-700">Organizer Contact Number:</span>
@@ -189,6 +235,7 @@ const AddEvent = () => {
                             required
                             placeholder="Enter organizer email"
                             className="mt-1 p-2 w-full border rounded-md"
+                            readOnly
                         />
                     </label>
 

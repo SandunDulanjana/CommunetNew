@@ -18,6 +18,7 @@ const UpdateEvent = () => {
     expectedCount: '',
     requestType: ''
   });
+  const [houseNumber, setHouseNumber] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -38,10 +39,19 @@ const UpdateEvent = () => {
         });
         
         if (response.data && response.data.event) {
-          // Find the specific event by ID from the array of events
           const eventToUpdate = response.data.event.find(e => e._id === id);
           if (eventToUpdate) {
-            setEvent(eventToUpdate);
+            // Check if venue is "At home" and extract house number
+            if (eventToUpdate.venue.startsWith('At home - ')) {
+              const [venue, houseNum] = eventToUpdate.venue.split(' - ');
+              setEvent({
+                ...eventToUpdate,
+                venue: 'At home'
+              });
+              setHouseNumber(houseNum);
+            } else {
+              setEvent(eventToUpdate);
+            }
           } else {
             setError('Event not found');
           }
@@ -75,9 +85,19 @@ const UpdateEvent = () => {
         alert('Please login to update event');
         return;
       }
+
+      // Validate house number if venue is "At home"
+      if (event.venue === 'At home' && !houseNumber.trim()) {
+        alert('Please enter house number');
+        return;
+      }
+
+      // Combine venue and house number if venue is "At home"
+      const finalVenue = event.venue === 'At home' ? `At home - ${houseNumber}` : event.venue;
+
       const response = await axios.put(
         `http://localhost:5000/api/event/update-event/${id}`,
-        event,
+        { ...event, venue: finalVenue },
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -86,7 +106,6 @@ const UpdateEvent = () => {
         }
       );
 
-
       if (response.data.success) {
         alert('Event updated successfully');
         navigate('/MyEvents');
@@ -94,8 +113,9 @@ const UpdateEvent = () => {
         alert(response.data.message || 'Failed to update event');
       }
     } catch (error) {
-      console.error('Error updating event:', error.response?.data || error.message);
-      alert('Failed to update event. Please try again.');
+      console.error('Error updating event:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to update event';
+      alert(errorMessage);
     }
   };
 
@@ -169,15 +189,35 @@ const UpdateEvent = () => {
 
           <div>
             <label className="block text-gray-700">Venue</label>
-            <input
-              type="text"
+            <select
               name="venue"
               value={event.venue}
               onChange={handleInputChange}
               className="mt-1 p-2 w-full border rounded-md"
               required
-            />
+            >
+              <option value="">Select venue</option>
+              <option value="Pool area">Pool area</option>
+              <option value="Rooftop">Rooftop</option>
+              <option value="Play ground">Play ground</option>
+              <option value="Common hall">Common hall</option>
+              <option value="At home">At home</option>
+            </select>
           </div>
+
+          {event.venue === 'At home' && (
+            <div>
+              <label className="block text-gray-700">House Number</label>
+              <input
+                type="text"
+                value={houseNumber}
+                onChange={(e) => setHouseNumber(e.target.value)}
+                placeholder="Enter house number"
+                className="mt-1 p-2 w-full border rounded-md"
+                required
+              />
+            </div>
+          )}
 
           <div>
             <label className="block text-gray-700">Contact Number</label>
@@ -234,13 +274,14 @@ const UpdateEvent = () => {
         <div className="mt-6 flex justify-end space-x-4">
           <button
             type="button"
-            onClick={() => navigate('/my-events')}
+            onClick={() => navigate('/MyEvents')}
             className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition"
           >
             Cancel
           </button>
           <button
             type="submit"
+            
             className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition"
           >
             Update Event
