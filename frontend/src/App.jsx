@@ -115,7 +115,6 @@ function App() {
         
         <Route path='/EditMaintenance/:id' element = {<EditMaintenance/>}></Route>
         <Route path='/financeHome' element={<FinanceHome/>} />
-        <Route path='/qr/:id' element = {<QR/>}></Route>
 
         <Route path='/UpdatePassword' element={<UpdatePassword/>} />
         <Route path='/notifications' element={<Notifications />} />
@@ -136,6 +135,7 @@ function App() {
         <Route path='/ticket' element={<Ticket />} />
         <Route path="/event-requests/:eventId" element={<EventRequest />} />
         <Route path="/mark-attendance/:eventId" element={<MarkAttendance />} />
+        <Route path="/event-qr/:id" element={<QR />} />
 
         
       </Routes>
