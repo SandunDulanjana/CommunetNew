@@ -60,6 +60,8 @@ import UpdateAddAnnoucement from './pages/UpdateAddAnnoucement';
 import DisplayAllAnnoucement from './pages/DisplayAllAnnoucement';
 
 import Ticket from './pages/Ticket';
+import EventRequest from './pages/EventRequest';
+import MarkAttendance from './pages/MarkAttendance';
 
 function App() {
   return (
@@ -125,6 +127,8 @@ function App() {
         <Route path='/displayallannoucement' element={<DisplayAllAnnoucement />} />
 
         <Route path='/ticket' element={<Ticket />} />
+        <Route path="/event-requests/:eventId" element={<EventRequest />} />
+        <Route path="/mark-attendance/:eventId" element={<MarkAttendance />} />
       </Routes>
       
     </div>
