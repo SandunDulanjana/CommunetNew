@@ -123,7 +123,7 @@ const LogIn = () => {
         </form>
 
         <div className="flex justify-between items-center mt-6">
-          <a href="#" className="text-blue-500 hover:underline text-sm">Forgot password?</a>
+          <a href="/forgotPassword" className="text-blue-500 hover:underline text-sm">Forgot password?</a>
           <button
             onClick={() => navigate('/Register')}
             className="text-blue-700 hover:underline text-sm font-semibold"

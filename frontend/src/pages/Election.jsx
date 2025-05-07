@@ -40,7 +40,7 @@ const Election = () => {
     }
 
     try {
-<<<<<<< Updated upstream
+
       await axios.post(
         `http://localhost:5000/api/poll/${pollId}/vote`,
         { optionIndex },
@@ -53,7 +53,7 @@ const Election = () => {
       setVotes({ ...votes, [pollId]: true });
       setSelectedOptions({ ...selectedOptions, [pollId]: optionIndex });
       fetchPolls(); // Refresh the polls to show updated results
-=======
+
       // Log the request data
       console.log('Sending vote request:', {
         pollId,
@@ -103,7 +103,7 @@ const Election = () => {
         // Refresh the polls to show updated results
         await fetchPolls();
       }
->>>>>>> Stashed changes
+      
     } catch (error) {
       // Log detailed error information
       console.error('Vote error details:', {

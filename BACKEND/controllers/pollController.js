@@ -86,7 +86,7 @@ export const votePoll = async (req, res) => {
     const poll = await Poll.findById(req.params.id);
     const { optionIndex } = req.body;
 
-<<<<<<< Updated upstream
+
     // Get token from header
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
@@ -96,7 +96,7 @@ export const votePoll = async (req, res) => {
     // Decode token to get user id
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
-=======
+
     // Log for debugging
     console.log('Poll ID:', req.params.id);
     console.log('Option Index:', optionIndex);
@@ -123,7 +123,7 @@ export const votePoll = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: "Invalid user ID format" });
     }
->>>>>>> Stashed changes
+
 
     // Ensure the optionIndex is within bounds
     if (optionIndex < 0 || optionIndex >= poll.options.length) {

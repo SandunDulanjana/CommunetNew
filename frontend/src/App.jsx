@@ -33,6 +33,8 @@ import MaintanCoPage from '../src/pages/MaintanCoPage';
 import UpdatePassword from '../src/pages/setting/UpdatePassword';
 import UpdateEmail from '../src/pages/setting/UpdateEmail';
 import TwoStepV from '../src/pages/setting/TwoStepV';
+import ForgotPassword from '../src/pages/setting/forgotPassword';
+import NewPassword from '../src/pages/setting/newPassword';
 
 import UpdateEvent from './pages/UpdateEvent';
 import EditElection from '../src/pages/EditElection'
@@ -75,6 +77,7 @@ function App() {
       <Route path='/AddEvent' element = {<AddEvent/>}></Route>
       <Route path='/ContactUs' element = {<ContactUs/>}></Route>
 
+      <Route path='/forgotPassword' element = {<ForgotPassword/>}></Route>
         <Route path='/Rules' element = {<Rules/>}></Route>
         <Route path='/LogIn' element = {<LogIn/>}></Route>
         <Route path='/Register' element = {<Register/>}></Route>
@@ -110,6 +113,7 @@ function App() {
         <Route path='/settings' element={<Settings />} />
         <Route path='/UpdateEmail' element={<UpdateEmail />} />
         <Route path='/TwoStepV' element={<TwoStepV />} />
+        <Route path='/new-Password' element={<NewPassword />} />
 
         <Route path='/addrule' element={<AddRule />} />
         <Route path='/updaterule/:id' element={<UpdateRule />} />
