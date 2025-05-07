@@ -20,6 +20,8 @@ import expenseRouter from '../BACKEND/routes/expenseRouter.js';
 import pollrouter from '../BACKEND/routes/pollRoute.js';
 import ProfileRouter from './routes/ProfileRoute.js';
 import ticketRouter from '../BACKEND/routes/TicketRoute.js';
+
+import paymentRouter from './routes/paymentRoute.js';
 //app config
 const app = express();
 const port = process.env.PORT || 5000;
@@ -52,6 +54,8 @@ app.use('/api/expense', expenseRouter);
 app.use('/api/poll', pollrouter);
 app.use('/api/ProfileRouter', ProfileRouter);
 app.use('/api/ticket', ticketRouter);
+app.use("/api/payments", paymentRouter);
+
 // QR Code generation endpoint
 app.post('/api/generate-qr', async (req, res) => {
   const { url } = req.body;

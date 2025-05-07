@@ -40,28 +40,7 @@ const Election = () => {
     }
 
     try {
-
-      await axios.post(
-        `http://localhost:5000/api/poll/${pollId}/vote`,
-        { optionIndex },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-      setVotes({ ...votes, [pollId]: true });
-      setSelectedOptions({ ...selectedOptions, [pollId]: optionIndex });
-      fetchPolls(); // Refresh the polls to show updated results
-
-      // Log the request data
-      console.log('Sending vote request:', {
-        pollId,
-        optionIndex,
-        userId
-      });
-
-      // First verify the poll exists
+      // First verify the poll exists and check if it's closed
       const pollResponse = await axios.get(`http://localhost:5000/api/poll/${pollId}`);
       const poll = pollResponse.data;
 
@@ -70,30 +49,17 @@ const Election = () => {
         return;
       }
 
-      // Check if user has already voted
-      if (poll.voters && poll.voters.includes(userId)) {
-        setVotes(prev => ({ ...prev, [pollId]: true }));
-        await fetchPolls();
-        return;
-      }
-
       // Send the vote request
       const response = await axios.post(
         `http://localhost:5000/api/poll/${pollId}/vote`,
-        {
-          optionIndex: Number(optionIndex),
-          userId: userId
-        },
+        { optionIndex },
         {
           headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
           }
         }
       );
-
-      // Log the response
-      console.log('Vote response:', response.data);
 
       if (response.data) {
         // Update local state
@@ -105,27 +71,12 @@ const Election = () => {
       }
       
     } catch (error) {
-      // Log detailed error information
-      console.error('Vote error details:', {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data,
-        request: {
-          url: error.config?.url,
-          method: error.config?.method,
-          data: error.config?.data
-        }
-      });
+      console.error('Vote error:', error.response?.data || error.message);
 
-      // Handle specific error cases
       if (error.response?.status === 400) {
         if (error.response?.data?.message === 'You have already voted.') {
           setVotes(prev => ({ ...prev, [pollId]: true }));
           await fetchPolls();
-          return;
-        }
-        if (error.response?.data?.message === 'Invalid user ID format') {
-          alert('Error: Invalid user ID. Please log in again.');
           return;
         }
         alert(error.response.data.message || 'Error submitting vote');

@@ -45,6 +45,12 @@ const addForm = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid phone number" });
         }
 
+        // Validate house number format (alphanumeric)
+        const houseNoRegex = /^[A-Za-z0-9]+$/;
+        if (!houseNoRegex.test(houseNo)) {
+            return res.status(400).json({ message: 'House number must be alphanumeric' });
+        }
+
         let imageUrl = null;
         if (imageFile) {
             try {
@@ -88,7 +94,7 @@ const addForm = async (req, res) => {
             name,
             phone: parseInt(phone, 10),
             email,
-            houseNo: parseInt(houseNo, 10),
+            houseNo,
             category,
             details,
             priority,

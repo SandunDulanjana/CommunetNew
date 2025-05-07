@@ -98,12 +98,6 @@ function CommuniCoPage() {
           </a>
         </div>
       </div>
-
-      {/* Recent Announcements */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="text-lg font-semibold mb-4">Recent Announcements</div>
-        <div className="text-center text-red-500">Failed to load announcements</div>
-      </div>
     </div>
   );
 }

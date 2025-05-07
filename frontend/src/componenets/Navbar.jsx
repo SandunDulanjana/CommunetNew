@@ -256,6 +256,12 @@ const Navbar = () => {
                       >
                         My Maintenance
                       </button>
+                      <button 
+                        onClick={() => { setIsMenuOpen(false); navigate('/MyPayments'); }} 
+                        className="w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                      >
+                        My Payments
+                      </button>
                       {userType !== 'member' && (
                         <button 
                           onClick={() => { setIsMenuOpen(false); handleDashboardClick(); }} 

@@ -30,7 +30,7 @@ const Register = () => {
       setMessage(response.data.message);
       if (response.data.success) {
         setTimeout(() => {
-          navigate('/LogIn');
+          navigate('/buy', { state: { email } });
         }, 1200); // Show message for 1.2s before navigating
       }
     } catch (error) {

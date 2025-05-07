@@ -24,6 +24,7 @@ import Election  from '../src/pages/Election'
 import Event  from '../src/pages/Event'
 import MyEvents from '../src/pages/MyEvents'
 import MyMaintance from './pages/MyMaintance';
+import MyPayments from "./pages/MyPayments";
 
 import CommuniCoPage from '../src/pages/CommuniCoPage';
 import ElectionCoPage from '../src/pages/ElectionCoPage';
@@ -62,6 +63,10 @@ import DisplayAllAnnoucement from './pages/DisplayAllAnnoucement';
 import Ticket from './pages/Ticket';
 import EventRequest from './pages/EventRequest';
 import MarkAttendance from './pages/MarkAttendance';
+import DustReport from '../src/pages/DustReport';
+import Success from '../src/pages/Success'
+
+
 
 function App() {
   return (
@@ -89,6 +94,7 @@ function App() {
         <Route path='/Event' element = {<Event/>}></Route>
         <Route path='/MyEvents' element = {<MyEvents/>}></Route>
         <Route path='/MyMaintance' element = {<MyMaintance/>}></Route>
+        <Route path='/MyPayments' element={<MyPayments />} />
 
 
         <Route path='/CommuniCoPage' element = {<CommuniCoPage/>}></Route>
@@ -100,11 +106,12 @@ function App() {
         <Route path='/UpdateEvent/:id' element = {<UpdateEvent/>}></Route>
         <Route path='/EditElection/:id' element = {<EditElection/>}></Route>
 
-        
+        <Route path='/dust-report' element={<DustReport />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/payment" element={<Payment />} />
         <Route path='/expences' element={<Expences/>} />
         <Route path='/buy' element={<BuyPlans/>}></Route>
+        <Route path='/success' element={<Success/>} />
         
         <Route path='/EditMaintenance/:id' element = {<EditMaintenance/>}></Route>
         <Route path='/financeHome' element={<FinanceHome/>} />
@@ -129,6 +136,8 @@ function App() {
         <Route path='/ticket' element={<Ticket />} />
         <Route path="/event-requests/:eventId" element={<EventRequest />} />
         <Route path="/mark-attendance/:eventId" element={<MarkAttendance />} />
+
+        
       </Routes>
       
     </div>
