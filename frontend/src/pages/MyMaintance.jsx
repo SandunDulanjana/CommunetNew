@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../componenets/Footer";
 import axios from "axios";
+import { FaEdit, FaTrash, FaCheckCircle, FaTimesCircle, FaClock } from 'react-icons/fa';
 
 const MyMaintenance = () => {
   const navigate = useNavigate();
@@ -101,6 +102,28 @@ const MyMaintenance = () => {
     }
   };
 
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'accepted':
+        return <FaCheckCircle className="text-green-500" />;
+      case 'rejected':
+        return <FaTimesCircle className="text-red-500" />;
+      default:
+        return <FaClock className="text-yellow-500" />;
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'accepted':
+        return 'bg-green-100 text-green-800';
+      case 'rejected':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-yellow-100 text-yellow-800';
+    }
+  };
+
   if (loading) {
     return <div className="text-center text-xl p-10">Loading...</div>;
   }
@@ -133,78 +156,91 @@ const MyMaintenance = () => {
               </p>
             </div>
           ) : (
-            <table className="min-w-full border-collapse border border-gray-300">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="p-2 border">House Owner</th>
-                  <th className="p-2 border">Phone</th>
-                  <th className="p-2 border">Email</th>
-                  <th className="p-2 border">House No.</th>
-                  <th className="p-2 border">Maintenance Type</th>
-                  <th className="p-2 border">Description</th>
-                  <th className="p-2 border">Priority</th>
-                  <th className="p-2 border">Image</th>
-                  <th className="p-2 border">Status</th>
-                  <th className="p-2 border">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {maintenance.map((request) => (
-                  <tr key={request._id} className="hover:bg-gray-100">
-                    <td className="p-2 border">{request.name || "N/A"}</td>
-                    <td className="p-2 border">{request.phone || "N/A"}</td>
-                    <td className="p-2 border">{request.email || "N/A"}</td>
-                    <td className="p-2 border">{request.houseNo || "N/A"}</td>
-                    <td className="p-2 border">{request.category || "N/A"}</td>
-                    <td className="p-2 border">{request.details || "N/A"}</td>
-                    <td className="p-2 border">{request.priority || "N/A"}</td>
-                    <td className="p-2 border">
-                      {request.images ? (
-                        <img
-                          src={request.images}
-                          alt="Maintenance"
-                          className="w-16 h-16 object-cover rounded-lg"
-                          onError={(e) => (e.target.src = "/default-image.png")}
-                        />
-                      ) : (
-                        "No Image"
-                      )}
-                    </td>
-                    <td className="p-2 border">
-                      <div className="flex flex-col">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                          request.status === 'accepted' ? 'bg-green-100 text-green-800' :
-                          request.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {request.status || 'pending'}
-                        </span>
-                        {request.status === 'rejected' && request.rejectionReason && (
-                          <div className="mt-1 text-xs text-red-600">
-                            <span className="font-semibold">Reason:</span> {request.rejectionReason}
-                          </div>
-                        )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {maintenance.map((request) => (
+                <div key={request._id} className="bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                  {/* Image Section */}
+                  <div className="relative h-48">
+                    {request.images ? (
+                      <img
+                        src={request.images}
+                        alt="Maintenance request"
+                        className="w-full h-full object-cover rounded-t-lg"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/default-image.png';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 rounded-t-lg flex items-center justify-center">
+                        <span className="text-gray-500">No image available</span>
                       </div>
-                    </td>
-                    <td className="p-2 border">
-                      <button
-                        onClick={() => handleEdit(request._id)}
-                        className="bg-yellow-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-yellow-600 transition mr-2"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(request._id)}
-                        className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-600 transition"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    )}
+                    {/* Status Badge */}
+                    <div className="absolute top-2 right-2">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 ${getStatusColor(request.status)}`}>
+                        {getStatusIcon(request.status)}
+                        {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Content Section */}
+                  <div className="p-4">
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">House No:</span> {request.houseNo || "N/A"}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Category:</span> {request.category || "N/A"}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Priority:</span>
+                        <span className={`ml-2 px-2 py-1 rounded text-xs ${
+                          request.priority === 'High' ? 'bg-red-100 text-red-800' :
+                          request.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-green-100 text-green-800'
+                        }`}>
+                          {request.priority || "N/A"}
+                        </span>
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Description:</span>
+                        <p className="mt-1 text-gray-700">{request.details || "N/A"}</p>
+                      </p>
+                      {request.status === 'rejected' && request.rejectionReason && (
+                        <div className="mt-2 p-2 bg-red-50 rounded">
+                          <p className="text-sm text-red-700">
+                            <span className="font-medium">Rejection Reason:</span>
+                            <p className="mt-1">{request.rejectionReason}</p>
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    {request.status === 'pending' && (
+                      <div className="mt-4 flex justify-end space-x-2">
+                        <button
+                          onClick={() => handleEdit(request._id)}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                          title="Edit Request"
+                        >
+                          <FaEdit />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(request._id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                          title="Delete Request"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 

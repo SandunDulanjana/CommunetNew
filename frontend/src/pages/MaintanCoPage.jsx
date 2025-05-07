@@ -22,6 +22,7 @@ function MaintanCoPage() {
   const [rejectionReason, setRejectionReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generatingReport, setGeneratingReport] = useState(false);
+  const [activeTab, setActiveTab] = useState('pending'); // New state for active tab
 
   useEffect(() => {
     const fetchMaintenance = async () => {
@@ -29,10 +30,9 @@ function MaintanCoPage() {
         const response = await axios.get(`http://localhost:5000/api/maintenance/displayAllMaintenanceRequests`);
         console.log('response data:', response.data);
         const allRequests = response.data.AllMaintainanceRequests || [];
-        // Filter out rejected requests
-        const activeRequests = allRequests.filter(request => request.status !== 'rejected');
-        setRequests(activeRequests);
-        setFilteredRequests(activeRequests);
+        setRequests(allRequests);
+        // Initial filter based on active tab
+        filterRequestsByStatus(allRequests, activeTab);
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching maintenance:', error);
@@ -44,10 +44,43 @@ function MaintanCoPage() {
     fetchMaintenance();
   }, []);
 
-  // Apply filters whenever filter state changes
+  // Function to filter requests by status
+  const filterRequestsByStatus = (requestsToFilter, status) => {
+    let filtered;
+    switch (status) {
+      case 'accepted':
+        filtered = requestsToFilter.filter(request => request.status === 'accepted');
+        break;
+      case 'rejected':
+        filtered = requestsToFilter.filter(request => request.status === 'rejected');
+        break;
+      case 'pending':
+      default:
+        filtered = requestsToFilter.filter(request => 
+          request.status !== 'accepted' && request.status !== 'rejected'
+        );
+        break;
+    }
+    setFilteredRequests(filtered);
+  };
+
+  // Update filtered requests when tab changes
+  useEffect(() => {
+    filterRequestsByStatus(requests, activeTab);
+  }, [activeTab, requests]);
+
+  // Apply additional filters (priority, category, houseNo)
   useEffect(() => {
     let filtered = [...requests];
 
+    // First filter by status
+    filtered = filtered.filter(request => {
+      if (activeTab === 'accepted') return request.status === 'accepted';
+      if (activeTab === 'rejected') return request.status === 'rejected';
+      return request.status !== 'accepted' && request.status !== 'rejected';
+    });
+
+    // Then apply other filters
     if (filters.priority) {
       filtered = filtered.filter(request => request.priority === filters.priority);
     }
@@ -59,7 +92,7 @@ function MaintanCoPage() {
     }
 
     setFilteredRequests(filtered);
-  }, [filters, requests]);
+  }, [filters, requests, activeTab]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -202,6 +235,42 @@ function MaintanCoPage() {
         </button>
       </div>
 
+      {/* Status Tabs */}
+      <div className="mb-6">
+        <div className="flex space-x-4 border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab('pending')}
+            className={`px-4 py-2 font-medium ${
+              activeTab === 'pending'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Pending Requests
+          </button>
+          <button
+            onClick={() => setActiveTab('accepted')}
+            className={`px-4 py-2 font-medium ${
+              activeTab === 'accepted'
+                ? 'text-green-600 border-b-2 border-green-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Accepted Requests
+          </button>
+          <button
+            onClick={() => setActiveTab('rejected')}
+            className={`px-4 py-2 font-medium ${
+              activeTab === 'rejected'
+                ? 'text-red-600 border-b-2 border-red-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Rejected Requests
+          </button>
+        </div>
+      </div>
+
       {/* Filter Section */}
       <div className="bg-white p-4 rounded-lg shadow mb-6">
         <h3 className="text-lg font-semibold mb-4">Filter Requests</h3>
@@ -271,7 +340,9 @@ function MaintanCoPage() {
 
       {/* Requests Grid */}
       {filteredRequests.length === 0 ? (
-        <div className="text-center text-gray-500 py-8">No maintenance requests match the selected filters.</div>
+        <div className="text-center text-gray-500 py-8">
+          No {activeTab} maintenance requests match the selected filters.
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredRequests.map((request) => (
@@ -319,21 +390,23 @@ function MaintanCoPage() {
                 )}
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex space-x-4 mt-4">
-                <button
-                  onClick={() => handleAccept(request._id)}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-                >
-                  Accept
-                </button>
-                <button
-                  onClick={() => handleRejectClick(request._id)}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-                >
-                  Reject
-                </button>
-              </div>
+              {/* Action Buttons - Only show for pending requests */}
+              {activeTab === 'pending' && (
+                <div className="flex space-x-4 mt-4">
+                  <button
+                    onClick={() => handleAccept(request._id)}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                  >
+                    Accept
+                  </button>
+                  <button
+                    onClick={() => handleRejectClick(request._id)}
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                  >
+                    Reject
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
