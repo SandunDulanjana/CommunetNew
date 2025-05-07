@@ -1,14 +1,41 @@
 import nodemailer from 'nodemailer';
 
+// Log email configuration (without sensitive data)
+console.log('Email configuration:', {
+    service: 'gmail',
+    user: process.env.EMAIL_USER ? 'Configured' : 'Not configured',
+    password: process.env.EMAIL_PASS ? 'Configured' : 'Not configured'
+});
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
+        pass: process.env.EMAIL_PASS
+    }
+});
+
+// Verify transporter configuration
+transporter.verify(function(error, success) {
+    if (error) {
+        console.error('Email transporter verification failed:', error);
+    } else {
+        console.log('Email transporter is ready to send messages');
     }
 });
 
 export const sendApprovalEmail = async (event) => {
+    console.log('Starting approval email process for event:', {
+        eventId: event._id,
+        eventName: event.eventName,
+        organizerEmail: event.organizarEmail
+    });
+    
+    if (!event || !event.organizarEmail) {
+        console.error('Missing event data or organizer email:', { event });
+        return;
+    }
+
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: event.organizarEmail,
@@ -28,14 +55,38 @@ export const sendApprovalEmail = async (event) => {
     };
 
     try {
-        await transporter.sendMail(mailOptions);
-        console.log('Approval email sent successfully');
+        console.log('Attempting to send approval email to:', event.organizarEmail);
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Approval email sent successfully:', {
+            messageId: info.messageId,
+            response: info.response,
+            accepted: info.accepted,
+            rejected: info.rejected
+        });
+        return true;
     } catch (error) {
-        console.error('Error sending approval email:', error);
+        console.error('Error sending approval email:', {
+            error: error.message,
+            code: error.code,
+            command: error.command
+        });
+        throw error;
     }
 };
 
-export const sendRejectionEmail = async (event) => {
+export const sendRejectionEmail = async (event, reason) => {
+    console.log('Starting rejection email process for event:', {
+        eventId: event._id,
+        eventName: event.eventName,
+        organizerEmail: event.organizarEmail,
+        reason: reason
+    });
+    
+    if (!event || !event.organizarEmail) {
+        console.error('Missing event data or organizer email:', { event });
+        return;
+    }
+
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: event.organizarEmail,
@@ -50,15 +101,29 @@ export const sendRejectionEmail = async (event) => {
                 <li>Time: ${event.time}</li>
                 <li>Venue: ${event.venue}</li>
             </ul>
+            <p><strong>Reason for Rejection:</strong></p>
+            <p>${reason}</p>
             <p>If you have any questions, please contact us.</p>
         `
     };
 
     try {
-        await transporter.sendMail(mailOptions);
-        console.log('Rejection email sent successfully');
+        console.log('Attempting to send rejection email to:', event.organizarEmail);
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Rejection email sent successfully:', {
+            messageId: info.messageId,
+            response: info.response,
+            accepted: info.accepted,
+            rejected: info.rejected
+        });
+        return true;
     } catch (error) {
-        console.error('Error sending rejection email:', error);
+        console.error('Error sending rejection email:', {
+            error: error.message,
+            code: error.code,
+            command: error.command
+        });
+        throw error;
     }
 };
 

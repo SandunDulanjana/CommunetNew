@@ -61,6 +61,13 @@ const EventRequest = () => {
   }, [eventId]);
 
   const handleRequestStatus = async (requestId, status) => {
+    // Show confirmation dialog
+    const confirmMsg = status === 'Approved'
+      ? 'Are you sure you want to approve this request?'
+      : 'Are you sure you want to reject this request?';
+    const confirmed = window.confirm(confirmMsg);
+    if (!confirmed) return;
+
     try {
       const token = localStorage.getItem('token');
       const response = await axios.put(
@@ -78,6 +85,8 @@ const EventRequest = () => {
         setRequests(requests.map(request => 
           request._id === requestId ? { ...request, status } : request
         ));
+        // Optionally, show a notification to the event owner
+        alert(`Request ${status.toLowerCase()}! The user will receive an email notification.`);
       }
     } catch (error) {
       console.error('Error updating request status:', error);

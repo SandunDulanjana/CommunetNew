@@ -9,11 +9,12 @@ const MyEvents = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
       const token = localStorage.getItem("token");
-      console.log("Token from localStorage:", token);
 
       if (!token) {
         setError('User not logged in.');
@@ -27,7 +28,7 @@ const MyEvents = () => {
             'Authorization': `Bearer ${token}`
           }
         });
-        console.log("API Response:", response.data);
+      
 
         if (response.data && response.data.event) {
           setEvents(response.data.event);
@@ -45,19 +46,31 @@ const MyEvents = () => {
     fetchEvents();
   }, []);
 
-  const handleDelete = async (eventId) => {
+  const handleDeleteClick = (eventId, eventName) => {
+    setEventToDelete({ id: eventId, name: eventName });
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/event/delete-event/${eventId}`, {
+      await axios.delete(`http://localhost:5000/api/event/delete-event/${eventToDelete.id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      setEvents(events.filter(event => event._id !== eventId));
+      setEvents(events.filter(event => event._id !== eventToDelete.id));
+      setShowDeleteModal(false);
+      setEventToDelete(null);
     } catch (error) {
       console.error('Error deleting event:', error);
       alert("Failed to delete event. Please try again.");
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+    setEventToDelete(null);
   };
 
   const handleEventClick = (eventId) => {
@@ -160,7 +173,7 @@ const MyEvents = () => {
                   <button
                     onClick={e => {
                       e.stopPropagation();
-                      handleDelete(event._id);
+                      handleDeleteClick(event._id, event.eventName);
                     }}
                     className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600 transition"
                   >
@@ -172,6 +185,33 @@ const MyEvents = () => {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4 text-red-700">Delete Event</h2>
+            <p className="mb-6">
+              Are you sure you want to delete the event "{eventToDelete?.name}"? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={handleDeleteCancel}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
