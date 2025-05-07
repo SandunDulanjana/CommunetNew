@@ -38,9 +38,9 @@ const Rules = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this rule?')) {
       try {
-        console.log('Deleting rule with ID:', id);
+        //console.log('Deleting rule with ID:', id);
         const res = await axios.delete(`http://localhost:5000/api/rules/deleterule/${id}`);
-        console.log('Delete response:', res.data);
+        //console.log('Delete response:', res.data);
         
         if (res.data.success) {
           setRules(rules.filter(rule => rule._id !== id));
@@ -61,7 +61,7 @@ const Rules = () => {
   };
 
   const handleUpdate = (id) => {
-    console.log('Updating rule with ID:', id);
+    //console.log('Updating rule with ID:', id);
     navigate(`/updaterule/${id}`);
   };
 

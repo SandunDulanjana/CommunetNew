@@ -14,6 +14,7 @@
     "@yudiel/react-qr-scanner": "^2.2.1",
     "axios": "^1.8.4",
     "cors": "^2.8.5",
+    "framer-motion": "^12.10.0",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "prop-types": "^15.8.1",

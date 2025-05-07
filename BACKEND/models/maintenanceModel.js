@@ -14,7 +14,7 @@ const maintenanceSchema = new mongoose.Schema({
         required: true
     },
     houseNo: {
-        type: Number,
+        type: String,
         required: true
     },
     category: {
