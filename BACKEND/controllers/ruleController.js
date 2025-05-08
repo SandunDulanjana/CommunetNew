@@ -4,7 +4,6 @@ import Rule from '../models/ruleModel.js';
 export const addRule = async (req, res) => {
   try {
     const { Rule_subject, discription } = req.body;
-    console.log('Adding new rule:', { Rule_subject, discription });
 
     if (!Rule_subject || !discription) {
       return res.status(400).json({ 
@@ -20,8 +19,7 @@ export const addRule = async (req, res) => {
     });
 
     const savedRule = await newRule.save();
-    console.log('Rule saved successfully:', savedRule);
-    
+   
     res.status(201).json({ 
       success: true,
       message: 'Rule added successfully',
@@ -57,16 +55,14 @@ export const displayRules = async (req, res) => {
 export const displayRuleById = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log('Attempting to fetch rule with ID:', id);
-
+   
     if (!id) {
       console.log('No rule ID provided');
       return res.status(400).json({ message: 'Rule ID is required' });
     }
 
     const rule = await Rule.findById(id);
-    console.log('Rule found:', rule);
-
+   
     if (!rule) {
       console.log('Rule not found');
       return res.status(404).json({ message: 'Rule not found' });
@@ -84,7 +80,7 @@ export const updateRule = async (req, res) => {
   try {
     const { id } = req.params;
     const { Rule_subject, discription } = req.body;
-    console.log('Updating rule:', { id, Rule_subject, discription });
+    
 
     if (!id) {
       return res.status(400).json({ message: 'Rule ID is required' });
@@ -120,8 +116,7 @@ export const updateRule = async (req, res) => {
 export const deleteRule = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log('Attempting to delete rule with ID:', id);
-
+    
     if (!id) {
       console.log('No rule ID provided');
       return res.status(400).json({ 
@@ -131,7 +126,7 @@ export const deleteRule = async (req, res) => {
     }
 
     const deletedRule = await Rule.findByIdAndDelete(id);
-    console.log('Delete result:', deletedRule);
+   
 
     if (!deletedRule) {
       console.log('Rule not found for deletion');
