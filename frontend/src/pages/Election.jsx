@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import Footer from '../componenets/Footer';
+import { motion } from 'framer-motion';
+import electionHeroImg from '../assets/Elections.jpg';
 
 const Election = () => {
   const [polls, setPolls] = useState([]);
@@ -103,100 +105,147 @@ const Election = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
-      {/* Main Content */}
-      <div className="flex-1 p-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Elections</h1>
-          <div className="min-h-screen bg-gray-100 p-6">
-            <div className="max-w-7xl mx-auto">
-              <h1 className="text-3xl font-bold text-gray-800 mb-8">Active Elections</h1>
-              
-              <div className="grid gap-6">
-                {polls.length > 0 ? (
-                  polls.map((poll) => (
-                    <div key={poll._id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                      <div className="p-6">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-4">{poll.question}</h2>
-                        
-                        {poll.closed ? (
-                          <div className="text-red-500 font-medium mb-4">This election is closed.</div>
-                        ) : (
-                          <div className="space-y-3 mb-6">
-                            {poll.options.map((option, index) => (
-                              <div
-                                key={index}
-                                className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                                  selectedOptions[poll._id] === index
-                                    ? 'border-blue-500 bg-blue-50'
-                                    : 'border-gray-200 hover:border-blue-300'
-                                }`}
-                                onClick={() => !poll.closed && handleVote(poll._id, index)}
-                              >
-                                <div className="flex justify-between items-center">
-                                  <span className="text-gray-700">{option.optionText}</span>
-                                  <span className="text-gray-500">{option.votes} votes</span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                        {votes[poll._id] ? (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                            <div>
-                              <h3 className="text-lg font-semibold mb-4">Results</h3>
-                              <BarChart width={400} height={300} data={prepareChartData(poll)}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="value" fill="#8884d8" />
-                              </BarChart>
-                            </div>
-                            <div>
-                              <h3 className="text-lg font-semibold mb-4">Distribution</h3>
-                              <PieChart width={400} height={300}>
-                                <Pie
-                                  data={prepareChartData(poll)}
-                                  cx={200}
-                                  cy={150}
-                                  labelLine={false}
-                                  outerRadius={100}
-                                  fill="#8884d8"
-                                  dataKey="value"
-                                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                                >
-                                  {prepareChartData(poll).map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                  ))}
-                                </Pie>
-                                <Tooltip />
-                                <Legend />
-                              </PieChart>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="text-center text-blue-600 font-medium mt-6">
-                            Please vote to see the results.
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-12 bg-white rounded-lg shadow-md">
-                    <p className="text-gray-600 text-lg">No active elections available</p>
-                  </div>
-                )}
-              </div>
-            </div>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Hero Section */}
+      <section className="relative h-[40vh] bg-blue-600">
+        <div className="absolute inset-0 bg-black/50 z-10"></div>
+        <img
+          src={electionHeroImg}
+          alt="Community Elections"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 z-20 flex items-center justify-center">
+          <div className="text-center text-white">
+            <h1 className="text-5xl font-bold mb-4">Community Elections</h1>
+            <p className="text-xl">Participate in community decisions and make your voice heard</p>
           </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <div className="flex-1 container mx-auto px-4 py-16 mt-12">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h2 className="text-3xl font-bold text-gray-800 mb-8">Active Elections</h2>
+            
+            <div className="grid gap-8">
+              {polls.length > 0 ? (
+                polls.map((poll) => (
+                  <motion.div
+                    key={poll._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                  >
+                    <div className="p-8">
+                      <h2 className="text-2xl font-semibold text-gray-800 mb-6">{poll.question}</h2>
+                      
+                      {poll.closed ? (
+                        <div className="bg-red-50 text-red-600 font-medium p-4 rounded-lg mb-6">
+                          This election is closed.
+                        </div>
+                      ) : (
+                        <div className="space-y-4 mb-8">
+                          {poll.options.map((option, index) => (
+                            <motion.div
+                              key={index}
+                              whileHover={{ scale: 1.02 }}
+                              className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                                selectedOptions[poll._id] === index
+                                  ? 'border-blue-500 bg-blue-50'
+                                  : 'border-gray-200 hover:border-blue-300'
+                              }`}
+                              onClick={() => !poll.closed && handleVote(poll._id, index)}
+                            >
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-700 font-medium">{option.optionText}</span>
+                                <span className="text-gray-500 bg-gray-100 px-3 py-1 rounded-full text-sm">
+                                  {option.votes} votes
+                                </span>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      )}
+
+                      {votes[poll._id] ? (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+                          <div className="bg-gray-50 p-6 rounded-xl">
+                            <h3 className="text-xl font-semibold mb-6 text-gray-800">Results</h3>
+                            <BarChart width={400} height={300} data={prepareChartData(poll)}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                              <XAxis dataKey="name" stroke="#6b7280" />
+                              <YAxis stroke="#6b7280" />
+                              <Tooltip 
+                                contentStyle={{ 
+                                  backgroundColor: 'white',
+                                  borderRadius: '8px',
+                                  border: 'none',
+                                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                                }}
+                              />
+                              <Legend />
+                              <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                          </div>
+                          <div className="bg-gray-50 p-6 rounded-xl">
+                            <h3 className="text-xl font-semibold mb-6 text-gray-800">Distribution</h3>
+                            <PieChart width={400} height={300}>
+                              <Pie
+                                data={prepareChartData(poll)}
+                                cx={200}
+                                cy={150}
+                                labelLine={false}
+                                outerRadius={100}
+                                fill="#8884d8"
+                                dataKey="value"
+                                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                              >
+                                {prepareChartData(poll).map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                              </Pie>
+                              <Tooltip 
+                                contentStyle={{ 
+                                  backgroundColor: 'white',
+                                  borderRadius: '8px',
+                                  border: 'none',
+                                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                                }}
+                              />
+                              <Legend />
+                            </PieChart>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-6 bg-blue-50 rounded-xl">
+                          <p className="text-blue-600 font-medium">
+                            Please vote to see the results
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                ))
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center py-16 bg-white rounded-2xl shadow-lg"
+                >
+                  <p className="text-gray-600 text-lg">No active elections available</p>
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
         </div>
       </div>
       
-      {/* Footer */}
       <Footer />
     </div>
   );
