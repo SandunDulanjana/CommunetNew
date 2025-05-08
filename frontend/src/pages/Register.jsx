@@ -55,7 +55,11 @@ const Register = () => {
       }
     } catch (error) {
       console.error("Registration Error:", error.response?.data || error.message);
-      setMessage(error.response?.data?.message || "Error registering user");
+      if (error.message === "Network Error") {
+        setMessage("Network error. Please check your connection and try again.");
+      } else {
+        setMessage(error.response?.data?.message || "Error registering user");
+      }
     }
   };
 

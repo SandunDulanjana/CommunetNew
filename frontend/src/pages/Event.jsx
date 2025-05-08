@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Footer from '../componenets/Footer';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import eventHeroImg from '../assets/events.jpeg';
+import eventHeroImg from '../assets/eventback.jpg';
 
 const Event = () => {
   const navigate = useNavigate();
