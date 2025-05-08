@@ -33,6 +33,51 @@ const verifyEmailConfig = async () => {
 // Call verification on startup
 verifyEmailConfig();
 
+// Create a transporter for sending emails
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
+  }
+});
+
+// Function to send email notification
+const sendStatusUpdateEmail = async (email, name, status, rejectionReason = null) => {
+  const subject = `Maintenance Request ${status.charAt(0).toUpperCase() + status.slice(1)}`;
+  let htmlContent = `
+    <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #333;">Maintenance Request Update</h2>
+      <p>Dear ${name},</p>
+      <p>Your maintenance request has been <strong>${status}</strong>.</p>
+  `;
+
+  if (status === 'rejected' && rejectionReason) {
+    htmlContent += `
+      <p><strong>Reason for rejection:</strong> ${rejectionReason}</p>
+    `;
+  }
+
+  htmlContent += `
+      <p>Thank you for your patience.</p>
+      <p>Best regards,<br>Community Management Team</p>
+    </div>
+  `;
+
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: subject,
+      html: htmlContent
+    });
+    console.log('Status update email sent successfully');
+  } catch (error) {
+    console.error('Error sending status update email:', error);
+    throw error;
+  }
+};
+
 const addForm = async (req, res) => {
     try {
         if (req.fileValidationError) {
@@ -53,6 +98,12 @@ const addForm = async (req, res) => {
         const phoneRegex = /^\d{10}$/;
         if (!phoneRegex.test(phone)) {
             return res.status(400).json({ success: false, message: "Invalid phone number" });
+        }
+
+        // Validate house number format (alphanumeric)
+        const houseNoRegex = /^[A-Za-z0-9]+$/;
+        if (!houseNoRegex.test(houseNo)) {
+            return res.status(400).json({ message: 'House number must be alphanumeric' });
         }
 
         let imageUrl = null;
@@ -86,7 +137,7 @@ const addForm = async (req, res) => {
             name,
             phone: parseInt(phone, 10),
             email,
-            houseNo: parseInt(houseNo, 10),
+            houseNo,
             category,
             details,
             priority,
@@ -268,6 +319,20 @@ const rejectRequest = async (req, res) => {
       { new: true, runValidators: true }
     );
 
+    // Send email notification
+    try {
+      await sendStatusUpdateEmail(request.email, request.name, 'rejected', rejectionReason);
+    } catch (emailError) {
+      console.error('Failed to send rejection email:', emailError);
+      // Continue with the response even if email fails
+    }
+
+    console.log('Updated request:', {
+      id: updatedRequest._id,
+      status: updatedRequest.status,
+      rejectionReason: updatedRequest.rejectionReason
+    });
+
     if (!updatedRequest) {
       return res.status(500).json({ success: false, message: 'Failed to update request' });
     }
@@ -334,6 +399,19 @@ const acceptRequest = async (req, res) => {
       },
       { new: true, runValidators: true }
     );
+
+    // Send email notification
+    try {
+      await sendStatusUpdateEmail(request.email, request.name, 'accepted');
+    } catch (emailError) {
+      console.error('Failed to send acceptance email:', emailError);
+      // Continue with the response even if email fails
+    }
+
+    console.log('Updated request:', {
+      id: updatedRequest._id,
+      status: updatedRequest.status
+    });
 
     if (!updatedRequest) {
       return res.status(500).json({ success: false, message: 'Failed to update request' });

@@ -8,6 +8,7 @@ import {
   closePoll,
   getPollById
 } from "../controllers/pollController.js";
+import { authenticateUser } from "../middlewares/authenticateUser.js";
 
 const router = express.Router();
 
@@ -27,10 +28,9 @@ router.delete("/:id", deletePoll);
 router.put("/:id", updatePoll);
 
 // Vote for a poll
-router.post("/:id/vote", votePoll);
+router.post("/:id/vote", authenticateUser, votePoll);
 
 // Close a poll
 router.put("/:id/close", closePoll);
-
 
 export default router;

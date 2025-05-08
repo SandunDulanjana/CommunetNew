@@ -19,10 +19,10 @@ const UpdateRule = () => {
         return;
       }
 
-      console.log('Fetching rule with ID:', id);
+      //console.log('Fetching rule with ID:', id);
       try {
         const res = await axios.get(`http://localhost:5000/api/rules/displayrule/${id}`);
-        console.log('Response from server:', res.data);
+       // console.log('Response from server:', res.data);
         
         if (res.data) {
           setTitle(res.data.Rule_subject || '');

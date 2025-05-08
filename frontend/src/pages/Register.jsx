@@ -10,17 +10,37 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
+  const [houseNoError, setHouseNoError] = useState("");
   const navigate = useNavigate();
+
+  const validateHouseNumber = (value) => {
+    const pattern = /^[A-D][1-3]0[1-4]$/;
+    if (!pattern.test(value)) {
+      setHouseNoError("House number must follow the pattern: [A-D][1-3]0[1-4] (e.g., A103, B204)");
+      return false;
+    }
+    setHouseNoError("");
+    return true;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "houseNo") sethouseNo(value);
+    if (name === "houseNo") {
+      sethouseNo(value.toUpperCase());
+      validateHouseNumber(value.toUpperCase());
+    }
     if (name === "email") setEmail(value);
     if (name === "password") setPassword(value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate house number before submission
+    if (!validateHouseNumber(houseNO)) {
+      return;
+    }
+
     try {
       const response = await axios.post("http://localhost:5000/api/user/register", {
         houseNO,
@@ -30,8 +50,8 @@ const Register = () => {
       setMessage(response.data.message);
       if (response.data.success) {
         setTimeout(() => {
-          navigate('/LogIn');
-        }, 1200); // Show message for 1.2s before navigating
+          navigate('/buy', { state: { email } });
+        }, 1200);
       }
     } catch (error) {
       console.error("Registration Error:", error.response?.data || error.message);
@@ -52,11 +72,21 @@ const Register = () => {
             <input
               type="text"
               name="houseNo"
-              className="w-full p-3 rounded-lg bg-gray-100 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="Enter your House Number"
+              value={houseNO}
+              className={`w-full p-3 rounded-lg bg-gray-100 border ${
+                houseNoError ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none`}
+              placeholder="Enter your House Number (e.g., A103)"
               onChange={handleChange}
               required
+              maxLength={4}
             />
+            {houseNoError && (
+              <p className="mt-1 text-sm text-red-600">{houseNoError}</p>
+            )}
+            <p className="mt-1 text-sm text-gray-500">
+              Format: [A-D][1-3]0[1-4] (e.g., A103, B204, C302, D104)
+            </p>
           </div>
           <div>
             <label className="block text-blue-900 text-sm font-semibold mb-2">Email</label>

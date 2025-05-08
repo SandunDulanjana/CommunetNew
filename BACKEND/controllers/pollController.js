@@ -1,5 +1,6 @@
 import Poll from "../models/pollModel.js";
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 
 // Get all polls
 export const getAllPolls = async (req, res) => {
@@ -83,34 +84,64 @@ export const updatePoll = async (req, res) => {
 export const votePoll = async (req, res) => {
   try {
     const poll = await Poll.findById(req.params.id);
-    const { optionIndex, userId } = req.body;
+    const { optionIndex } = req.body;
+
+
+    // Get token from header
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    // Decode token to get user id
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
 
     // Log for debugging
     console.log('Poll ID:', req.params.id);
     console.log('Option Index:', optionIndex);
     console.log('User ID:', userId);
+    console.log('Poll exists:', !!poll);
+    if (poll) {
+      console.log('Poll closed:', poll.closed);
+      console.log('Poll options length:', poll.options.length);
+      console.log('User already voted:', poll.voters.includes(userId));
+    }
+
+    if (!poll) {
+      return res.status(404).json({ message: "Poll not found" });
+    }
+
+    if (poll.closed) {
+      return res.status(400).json({ message: "This poll is closed and no longer accepting votes." });
+    }
+
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user ID format" });
+    }
+
 
     // Ensure the optionIndex is within bounds
     if (optionIndex < 0 || optionIndex >= poll.options.length) {
       return res.status(400).json({ message: "Invalid option index." });
     }
 
-    if (poll) {
-      if (poll.voters.includes(userId)) {
-        return res.status(400).json({ message: "You have already voted." });
-      }
-      
-      // Update the poll
-      poll.options[optionIndex].votes += 1;
-      poll.voters.push(userId);
-      
-      // Save the updated poll
-      await poll.save();
-      
-      res.json(poll);
-    } else {
-      return res.status(404).json({ message: "Poll not found" });
+    if (poll.voters.includes(userId)) {
+      return res.status(400).json({ message: "You have already voted." });
     }
+    
+    // Update the poll
+    poll.options[optionIndex].votes += 1;
+    poll.voters.push(userId);
+    
+    // Save the updated poll
+    await poll.save();
+    
+    res.json(poll);
   } catch (err) {
     console.error("Error voting on poll:", err); 
     res.status(500).json({ message: err.message });

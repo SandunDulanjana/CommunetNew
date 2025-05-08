@@ -24,6 +24,7 @@ import Election  from '../src/pages/Election'
 import Event  from '../src/pages/Event'
 import MyEvents from '../src/pages/MyEvents'
 import MyMaintance from './pages/MyMaintance';
+import MyPayments from "./pages/MyPayments";
 
 import CommuniCoPage from '../src/pages/CommuniCoPage';
 import ElectionCoPage from '../src/pages/ElectionCoPage';
@@ -33,6 +34,8 @@ import MaintanCoPage from '../src/pages/MaintanCoPage';
 import UpdatePassword from '../src/pages/setting/UpdatePassword';
 import UpdateEmail from '../src/pages/setting/UpdateEmail';
 import TwoStepV from '../src/pages/setting/TwoStepV';
+import ForgotPassword from '../src/pages/setting/forgotPassword';
+import NewPassword from '../src/pages/setting/newPassword';
 
 import UpdateEvent from './pages/UpdateEvent';
 import EditElection from '../src/pages/EditElection'
@@ -58,6 +61,12 @@ import UpdateAddAnnoucement from './pages/UpdateAddAnnoucement';
 import DisplayAllAnnoucement from './pages/DisplayAllAnnoucement';
 
 import Ticket from './pages/Ticket';
+import EventRequest from './pages/EventRequest';
+import MarkAttendance from './pages/MarkAttendance';
+import DustReport from '../src/pages/DustReport';
+import Success from '../src/pages/Success'
+
+
 
 function App() {
   return (
@@ -75,6 +84,7 @@ function App() {
       <Route path='/AddEvent' element = {<AddEvent/>}></Route>
       <Route path='/ContactUs' element = {<ContactUs/>}></Route>
 
+      <Route path='/forgotPassword' element = {<ForgotPassword/>}></Route>
         <Route path='/Rules' element = {<Rules/>}></Route>
         <Route path='/LogIn' element = {<LogIn/>}></Route>
         <Route path='/Register' element = {<Register/>}></Route>
@@ -84,6 +94,7 @@ function App() {
         <Route path='/Event' element = {<Event/>}></Route>
         <Route path='/MyEvents' element = {<MyEvents/>}></Route>
         <Route path='/MyMaintance' element = {<MyMaintance/>}></Route>
+        <Route path='/MyPayments' element={<MyPayments />} />
 
 
         <Route path='/CommuniCoPage' element = {<CommuniCoPage/>}></Route>
@@ -95,21 +106,22 @@ function App() {
         <Route path='/UpdateEvent/:id' element = {<UpdateEvent/>}></Route>
         <Route path='/EditElection/:id' element = {<EditElection/>}></Route>
 
-        
+        <Route path='/dust-report' element={<DustReport />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/payment" element={<Payment />} />
         <Route path='/expences' element={<Expences/>} />
         <Route path='/buy' element={<BuyPlans/>}></Route>
+        <Route path='/success' element={<Success/>} />
         
         <Route path='/EditMaintenance/:id' element = {<EditMaintenance/>}></Route>
         <Route path='/financeHome' element={<FinanceHome/>} />
-        <Route path='/qr/:id' element = {<QR/>}></Route>
 
         <Route path='/UpdatePassword' element={<UpdatePassword/>} />
         <Route path='/notifications' element={<Notifications />} />
         <Route path='/settings' element={<Settings />} />
         <Route path='/UpdateEmail' element={<UpdateEmail />} />
         <Route path='/TwoStepV' element={<TwoStepV />} />
+        <Route path='/new-Password' element={<NewPassword />} />
 
         <Route path='/addrule' element={<AddRule />} />
         <Route path='/updaterule/:id' element={<UpdateRule />} />
@@ -121,6 +133,11 @@ function App() {
         <Route path='/displayallannoucement' element={<DisplayAllAnnoucement />} />
 
         <Route path='/ticket' element={<Ticket />} />
+        <Route path="/event-requests/:eventId" element={<EventRequest />} />
+        <Route path="/mark-attendance/:eventId" element={<MarkAttendance />} />
+        <Route path="/event-qr/:id" element={<QR />} />
+
+        
       </Routes>
       
     </div>
