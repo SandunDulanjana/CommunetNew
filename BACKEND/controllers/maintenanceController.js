@@ -3,6 +3,47 @@ import maintenanceModel from "../models/maintenanceModel.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from 'fs';
 import PDFDocument from 'pdfkit';
+import nodemailer from 'nodemailer';
+import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
+import Chart from 'chart.js/auto';
+
+// Create nodemailer transporter
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
+
+// Verify email configuration
+const verifyEmailConfig = async () => {
+    try {
+        // Debug: Log environment variables (masked for security)
+        console.log('Email Configuration Check:');
+        console.log('EMAIL_USER exists:', !!process.env.EMAIL_USER);
+        console.log('EMAIL_PASSWORD exists:', !!process.env.EMAIL_PASSWORD);
+        
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+            console.error('Email configuration missing. Please set EMAIL_USER and EMAIL_PASSWORD in .env file');
+            return false;
+        }
+
+        // Test the transporter configuration
+        await transporter.verify();
+        console.log('Email configuration verified successfully');
+        return true;
+    } catch (error) {
+        console.error('Email configuration error:', error);
+        if (error.code === 'EAUTH') {
+            console.error('Authentication failed. Please check your email credentials.');
+        }
+        return false;
+    }
+};
+
+// Call verification on startup
+verifyEmailConfig();
 
 const addForm = async (req, res) => {
     try {
@@ -288,12 +329,14 @@ const rejectRequest = async (req, res) => {
     console.log('Rejecting request:', { id, rejectionReason });
 
     if (!rejectionReason) {
+      console.log('Missing rejection reason');
       return res.status(400).json({ success: false, message: 'Rejection reason is required' });
     }
 
     // Find the request first to ensure it exists
     const request = await maintenanceModel.findById(id);
     if (!request) {
+      console.log('Request not found:', id);
       return res.status(404).json({ success: false, message: 'Maintenance request not found' });
     }
 
@@ -319,7 +362,39 @@ const rejectRequest = async (req, res) => {
     });
 
     if (!updatedRequest) {
+      console.log('Failed to update request:', id);
       return res.status(500).json({ success: false, message: 'Failed to update request' });
+    }
+
+    try {
+      // Send rejection email
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: request.email,
+        subject: 'Maintenance Request Rejected',
+        html: `
+          <h2>Your Maintenance Request Has Been Rejected</h2>
+          <p>Dear ${request.name},</p>
+          <p>Your maintenance request has been rejected. Here are the details:</p>
+          <ul>
+            <li><strong>House Number:</strong> ${request.houseNo}</li>
+            <li><strong>Category:</strong> ${request.category}</li>
+            <li><strong>Priority:</strong> ${request.priority}</li>
+            <li><strong>Description:</strong> ${request.details}</li>
+            <li><strong>Rejection Reason:</strong> ${rejectionReason}</li>
+          </ul>
+          <p>If you have any questions or concerns, please contact the maintenance team.</p>
+          <br>
+          <p>Best regards,</p>
+          <p>Maintenance Team</p>
+        `
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log('Rejection email sent successfully to:', request.email);
+    } catch (emailError) {
+      console.error('Error sending rejection email:', emailError);
+      // Don't fail the request if email fails
     }
 
     res.status(200).json({
@@ -329,7 +404,12 @@ const rejectRequest = async (req, res) => {
     });
   } catch (error) {
     console.error('Error rejecting request:', error);
-    res.status(500).json({ success: false, message: 'Error rejecting request', error: error.message });
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error rejecting request', 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 
@@ -343,6 +423,7 @@ const acceptRequest = async (req, res) => {
     // Find the request first to ensure it exists
     const request = await maintenanceModel.findById(id);
     if (!request) {
+      console.log('Request not found:', id);
       return res.status(404).json({ success: false, message: 'Maintenance request not found' });
     }
 
@@ -366,7 +447,39 @@ const acceptRequest = async (req, res) => {
     });
 
     if (!updatedRequest) {
+      console.log('Failed to update request:', id);
       return res.status(500).json({ success: false, message: 'Failed to update request' });
+    }
+
+    try {
+      // Send acceptance email
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: request.email,
+        subject: 'Maintenance Request Accepted',
+        html: `
+          <h2>Your Maintenance Request Has Been Accepted</h2>
+          <p>Dear ${request.name},</p>
+          <p>Your maintenance request has been accepted. Here are the details:</p>
+          <ul>
+            <li><strong>House Number:</strong> ${request.houseNo}</li>
+            <li><strong>Category:</strong> ${request.category}</li>
+            <li><strong>Priority:</strong> ${request.priority}</li>
+            <li><strong>Description:</strong> ${request.details}</li>
+          </ul>
+          <p>Our team will contact you shortly to schedule the maintenance work.</p>
+          <p>Thank you for your patience.</p>
+          <br>
+          <p>Best regards,</p>
+          <p>Maintenance Team</p>
+        `
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log('Acceptance email sent successfully to:', request.email);
+    } catch (emailError) {
+      console.error('Error sending acceptance email:', emailError);
+      // Don't fail the request if email fails
     }
 
     res.status(200).json({
@@ -376,7 +489,12 @@ const acceptRequest = async (req, res) => {
     });
   } catch (error) {
     console.error('Error accepting request:', error);
-    res.status(500).json({ success: false, message: 'Error accepting request', error: error.message });
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error accepting request', 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 
@@ -405,18 +523,176 @@ const generateReport = async (req, res) => {
     doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: 'right' });
     doc.moveDown();
 
-    // Add summary
+    // Calculate statistics
     const totalRequests = requests.length;
     const acceptedRequests = requests.filter(req => req.status === 'accepted').length;
     const rejectedRequests = requests.filter(req => req.status === 'rejected').length;
     const pendingRequests = requests.filter(req => req.status === 'pending').length;
 
+    // Calculate category distribution
+    const categoryCount = {};
+    requests.forEach(req => {
+      categoryCount[req.category] = (categoryCount[req.category] || 0) + 1;
+    });
+    const mostCommonCategory = Object.entries(categoryCount)
+      .sort((a, b) => b[1] - a[1])[0];
+
+    // Calculate house number distribution
+    const houseNoCount = {};
+    requests.forEach(req => {
+      houseNoCount[req.houseNo] = (houseNoCount[req.houseNo] || 0) + 1;
+    });
+    const mostCommonHouseNo = Object.entries(houseNoCount)
+      .sort((a, b) => b[1] - a[1])[0];
+
+    // Generate pie chart for categories
+    const width = 400;
+    const height = 400;
+    const chartCallback = (ChartJS) => {
+      ChartJS.defaults.color = '#000000';
+      ChartJS.defaults.font.family = 'Arial';
+    };
+
+    const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, chartCallback });
+
+    // Category Pie Chart
+    const categoryData = {
+      labels: Object.keys(categoryCount),
+      datasets: [{
+        data: Object.values(categoryCount),
+        backgroundColor: [
+          '#FF6384',
+          '#36A2EB',
+          '#FFCE56',
+          '#4BC0C0',
+          '#9966FF',
+          '#FF9F40'
+        ]
+      }]
+    };
+
+    const categoryConfig = {
+      type: 'pie',
+      data: categoryData,
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Maintenance Requests by Category',
+            font: {
+              size: 16
+            }
+          },
+          legend: {
+            position: 'right',
+            labels: {
+              font: {
+                size: 12
+              }
+            }
+          }
+        }
+      }
+    };
+
+    // House Number Bar Chart
+    const houseNoData = {
+      labels: Object.keys(houseNoCount).map(no => `House ${no}`),
+      datasets: [{
+        label: 'Number of Requests',
+        data: Object.values(houseNoCount),
+        backgroundColor: '#36A2EB',
+        borderColor: '#2196F3',
+        borderWidth: 1
+      }]
+    };
+
+    const houseNoConfig = {
+      type: 'bar',
+      data: houseNoData,
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Maintenance Requests by House Number',
+            font: {
+              size: 16
+            }
+          },
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Number of Requests'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'House Numbers'
+            }
+          }
+        }
+      }
+    };
+
+    // Generate both chart images
+    const categoryChartImage = await chartJSNodeCanvas.renderToBuffer(categoryConfig);
+    const houseNoChartImage = await chartJSNodeCanvas.renderToBuffer(houseNoConfig);
+
+    // Add summary
     doc.fontSize(14).text('Summary', { underline: true });
     doc.fontSize(12)
       .text(`Total Requests: ${totalRequests}`)
       .text(`Accepted Requests: ${acceptedRequests}`)
       .text(`Rejected Requests: ${rejectedRequests}`)
-      .text(`Pending Requests: ${pendingRequests}`);
+      .text(`Pending Requests: ${pendingRequests}`)
+      .moveDown()
+      .text(`Most Common Category: ${mostCommonCategory[0]} (${mostCommonCategory[1]} requests)`)
+      .text(`Most Common House Number: ${mostCommonHouseNo[0]} (${mostCommonHouseNo[1]} requests)`);
+    doc.moveDown();
+
+    // Add category distribution with pie chart
+    doc.fontSize(14).text('Category Distribution', { underline: true });
+    doc.moveDown();
+    
+    // Add the pie chart to the PDF
+    doc.image(categoryChartImage, {
+      fit: [400, 400],
+      align: 'center'
+    });
+    doc.moveDown();
+
+    // Add category details
+    Object.entries(categoryCount)
+      .sort((a, b) => b[1] - a[1])
+      .forEach(([category, count]) => {
+        doc.fontSize(12).text(`${category}: ${count} requests`);
+      });
+    doc.moveDown();
+
+    // Add house number distribution with bar chart
+    doc.fontSize(14).text('House Number Distribution', { underline: true });
+    doc.moveDown();
+    
+    // Add the bar chart to the PDF
+    doc.image(houseNoChartImage, {
+      fit: [400, 400],
+      align: 'center'
+    });
+    doc.moveDown();
+
+    // Add house number details
+    Object.entries(houseNoCount)
+      .sort((a, b) => b[1] - a[1])
+      .forEach(([houseNo, count]) => {
+        doc.fontSize(12).text(`House ${houseNo}: ${count} requests`);
+      });
     doc.moveDown();
 
     // Add detailed request information
