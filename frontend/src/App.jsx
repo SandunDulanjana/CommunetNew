@@ -45,9 +45,7 @@ import Checkout from './pages/CheckOut';
 import Payment from "./pages/Payment";
 
 import QR from './pages/QR';
-import Expences from './pages/Expences'
 import EditMaintenance from './pages/EditMaintenance';
-import FinanceHome from './pages/FinanceHome';
 
 import Notifications from './pages/notifications';
 import Settings from './pages/settings';
@@ -65,7 +63,7 @@ import EventRequest from './pages/EventRequest';
 import MarkAttendance from './pages/MarkAttendance';
 import DustReport from '../src/pages/DustReport';
 import Success from '../src/pages/Success'
-
+import PrivateRoute from './componenets/PrivateRoute';
 
 
 function App() {
@@ -75,67 +73,64 @@ function App() {
       <Routes>
       <Route path='/' element = {<Home/>}></Route>
       <Route path='/AboutUs' element = {<AboutUs/>}></Route>
-      <Route path='/Adminadd' element = {<Adminadd/>}></Route>
-      <Route path='/AdminPage' element = {<AdminPage/>}></Route>
-      <Route path='//AdminUpdate/:id' element = {<AdminUpdate/>}></Route>
+      <Route path='/Adminadd' element = {<PrivateRoute><Adminadd/></PrivateRoute>}></Route>
+      <Route path='/AdminPage' element = {<PrivateRoute><AdminPage/></PrivateRoute>}></Route>
+      <Route path='//AdminUpdate/:id' element = {<PrivateRoute><AdminUpdate/></PrivateRoute>}></Route>
 
-      <Route path='/AddMaintenance' element = {<AddMaintenance/>}></Route>
-      <Route path='/addElection' element = {<AddElection/>}></Route>
-      <Route path='/AddEvent' element = {<AddEvent/>}></Route>
+      <Route path='/AddMaintenance' element={<PrivateRoute><AddMaintenance /></PrivateRoute>} />
+      <Route path='/addElection' element={<PrivateRoute><AddElection /></PrivateRoute>} />
+      <Route path='/AddEvent' element={<PrivateRoute><AddEvent /></PrivateRoute>} />
       <Route path='/ContactUs' element = {<ContactUs/>}></Route>
 
       <Route path='/forgotPassword' element = {<ForgotPassword/>}></Route>
         <Route path='/Rules' element = {<Rules/>}></Route>
         <Route path='/LogIn' element = {<LogIn/>}></Route>
         <Route path='/Register' element = {<Register/>}></Route>
-        <Route path='/RUserProfile' element = {<RUserProfile/>}></Route>
+        <Route path='/RUserProfile' element={<PrivateRoute><RUserProfile /></PrivateRoute>} />
 
-        <Route path='/Election' element = {<Election/>}></Route>
-        <Route path='/Event' element = {<Event/>}></Route>
-        <Route path='/MyEvents' element = {<MyEvents/>}></Route>
-        <Route path='/MyMaintance' element = {<MyMaintance/>}></Route>
-        <Route path='/MyPayments' element={<MyPayments />} />
+      <Route path='/Election' element={<PrivateRoute><Election /></PrivateRoute>} />
+      <Route path='/Event' element={<PrivateRoute><Event /></PrivateRoute>} />
+      <Route path='/MyEvents' element={<PrivateRoute><MyEvents /></PrivateRoute>} />
+      <Route path='/MyMaintance' element={<PrivateRoute><MyMaintance /></PrivateRoute>} />
+      <Route path='/MyPayments' element={<PrivateRoute><MyPayments /></PrivateRoute>} />
 
+      <Route path='/CommuniCoPage' element={<PrivateRoute><CommuniCoPage /></PrivateRoute>} />
+      <Route path='/ElectionCoPage' element={<PrivateRoute><ElectionCoPage /></PrivateRoute>} />
+      <Route path='/EventCoPage' element={<PrivateRoute><EventCoPage /></PrivateRoute>} />
+      <Route path='/FinaceCoPage' element={<PrivateRoute><FinaceCoPage /></PrivateRoute>} />
+      <Route path='/MaintanCoPage' element={<PrivateRoute><MaintanCoPage /></PrivateRoute>} />
 
-        <Route path='/CommuniCoPage' element = {<CommuniCoPage/>}></Route>
-        <Route path='/ElectionCoPage' element = {<ElectionCoPage/>}></Route>
-        <Route path='/EventCoPage' element = {<EventCoPage/>}></Route>
-        <Route path='/FinaceCoPage' element = {<FinaceCoPage/>}></Route>
-        <Route path='/MaintanCoPage' element = {<MaintanCoPage/>}></Route>
+      <Route path='/UpdateEvent/:id' element={<PrivateRoute><UpdateEvent /></PrivateRoute>} />
+      <Route path='/EditElection/:id' element={<PrivateRoute><EditElection /></PrivateRoute>} />
 
-        <Route path='/UpdateEvent/:id' element = {<UpdateEvent/>}></Route>
-        <Route path='/EditElection/:id' element = {<EditElection/>}></Route>
+      <Route path='/dust-report' element={<PrivateRoute><DustReport /></PrivateRoute>} />
+      <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
+      <Route path="/payment" element={<PrivateRoute><Payment /></PrivateRoute>} />
+      <Route path='/buy' element={<PrivateRoute><BuyPlans /></PrivateRoute>} />
+      <Route path='/success' element={<PrivateRoute><Success /></PrivateRoute>} />
 
-        <Route path='/dust-report' element={<DustReport />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/payment" element={<Payment />} />
-        <Route path='/expences' element={<Expences/>} />
-        <Route path='/buy' element={<BuyPlans/>}></Route>
-        <Route path='/success' element={<Success/>} />
-        
-        <Route path='/EditMaintenance/:id' element = {<EditMaintenance/>}></Route>
-        <Route path='/financeHome' element={<FinanceHome/>} />
+      <Route path='/EditMaintenance/:id' element={<PrivateRoute><EditMaintenance /></PrivateRoute>} />
 
-        <Route path='/UpdatePassword' element={<UpdatePassword/>} />
-        <Route path='/notifications' element={<Notifications />} />
-        <Route path='/settings' element={<Settings />} />
-        <Route path='/UpdateEmail' element={<UpdateEmail />} />
-        <Route path='/TwoStepV' element={<TwoStepV />} />
-        <Route path='/new-Password' element={<NewPassword />} />
+      <Route path='/UpdatePassword' element={<PrivateRoute><UpdatePassword /></PrivateRoute>} />
+      <Route path='/notifications' element={<PrivateRoute><Notifications /></PrivateRoute>} />
+      <Route path='/settings' element={<PrivateRoute><Settings /></PrivateRoute>} />
+      <Route path='/UpdateEmail' element={<PrivateRoute><UpdateEmail /></PrivateRoute>} />
+      <Route path='/TwoStepV' element={<PrivateRoute><TwoStepV /></PrivateRoute>} />
+      <Route path='/new-Password' element={<PrivateRoute><NewPassword /></PrivateRoute>} />
 
-        <Route path='/addrule' element={<AddRule />} />
-        <Route path='/updaterule/:id' element={<UpdateRule />} />
+      <Route path='/addrule' element={<PrivateRoute><AddRule /></PrivateRoute>} />
+      <Route path='/updaterule/:id' element={<PrivateRoute><UpdateRule /></PrivateRoute>} />
 
-        <Route path='/community-rules' element={<DisplayRules />} />
+      <Route path='/community-rules' element={<PrivateRoute><DisplayRules /></PrivateRoute>} />
 
-        <Route path='/addannoucement' element={<AddAnnoucement />} />
-        <Route path='/updateannoucement/:id' element={<UpdateAddAnnoucement />} />
-        <Route path='/displayallannoucement' element={<DisplayAllAnnoucement />} />
+      <Route path='/addannoucement' element={<PrivateRoute><AddAnnoucement /></PrivateRoute>} />
+      <Route path='/updateannoucement/:id' element={<PrivateRoute><UpdateAddAnnoucement /></PrivateRoute>} />
+      <Route path='/displayallannoucement' element={<PrivateRoute><DisplayAllAnnoucement /></PrivateRoute>} />
 
-        <Route path='/ticket' element={<Ticket />} />
-        <Route path="/event-requests/:eventId" element={<EventRequest />} />
-        <Route path="/mark-attendance/:eventId" element={<MarkAttendance />} />
-        <Route path="/event-qr/:id" element={<QR />} />
+      <Route path='/ticket' element={<PrivateRoute><Ticket /></PrivateRoute>} />
+      <Route path="/event-requests/:eventId" element={<PrivateRoute><EventRequest /></PrivateRoute>} />
+      <Route path="/mark-attendance/:eventId" element={<PrivateRoute><MarkAttendance /></PrivateRoute>} />
+      <Route path="/event-qr/:id" element={<PrivateRoute><QR /></PrivateRoute>} />
 
         
       </Routes>

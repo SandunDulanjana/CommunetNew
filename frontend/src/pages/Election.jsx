@@ -52,7 +52,9 @@ const Election = () => {
 
   // Handle voting logic
   const handleVote = async (pollId, optionIndex) => {
-    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = user?.token;
+    console.log("Token in localStorage:", token);
 
     if (!token) {
       alert("Please log in to vote.");
@@ -101,6 +103,7 @@ const Election = () => {
         if (error.response?.data?.message === "You have already voted.") {
           setVotes(prev => ({ ...prev, [pollId]: true }));
           await fetchPolls();
+          alert("You have already voted in this poll.");
           return;
         }
         alert(error.response.data.message || "Error submitting vote");

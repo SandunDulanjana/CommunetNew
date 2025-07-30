@@ -26,7 +26,8 @@ const RUserProfile = () => {
     const fetchUserData = async () => {
       try {
         if (!token) {
-          console.error("No token found.");
+          // Optionally redirect to login
+          window.location.href = "/login";
           setIsLoading(false);
           return;
         }

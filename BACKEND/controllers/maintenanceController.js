@@ -7,19 +7,19 @@ import nodemailer from 'nodemailer';
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
 import Chart from 'chart.js/auto';
 
-// Create nodemailer transporter
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
+        pass: process.env.EMAIL_PASS
     }
 });
 
-// Verify email configuration
+//verify email
 const verifyEmailConfig = async () => {
     try {
-        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
             return false;
         }
         await transporter.verify();
@@ -30,19 +30,10 @@ const verifyEmailConfig = async () => {
     }
 };
 
-// Call verification on startup
 verifyEmailConfig();
 
-// Create a transporter for sending emails
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
-  }
-});
 
-// Function to send email notification
+//function to send email
 const sendStatusUpdateEmail = async (email, name, status, rejectionReason = null) => {
   const subject = `Maintenance Request ${status.charAt(0).toUpperCase() + status.slice(1)}`;
   let htmlContent = `
@@ -100,7 +91,7 @@ const addForm = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid phone number" });
         }
 
-        // Validate house number format (alphanumeric)
+      
         const houseNoRegex = /^[A-Za-z0-9]+$/;
         if (!houseNoRegex.test(houseNo)) {
             return res.status(400).json({ message: 'House number must be alphanumeric' });
@@ -319,12 +310,12 @@ const rejectRequest = async (req, res) => {
       { new: true, runValidators: true }
     );
 
-    // Send email notification
+    //send email
     try {
       await sendStatusUpdateEmail(request.email, request.name, 'rejected', rejectionReason);
     } catch (emailError) {
       console.error('Failed to send rejection email:', emailError);
-      // Continue with the response even if email fails
+      //works even if email fails
     }
 
     console.log('Updated request:', {
@@ -400,12 +391,11 @@ const acceptRequest = async (req, res) => {
       { new: true, runValidators: true }
     );
 
-    // Send email notification
+    // Send email 
     try {
       await sendStatusUpdateEmail(request.email, request.name, 'accepted');
     } catch (emailError) {
       console.error('Failed to send acceptance email:', emailError);
-      // Continue with the response even if email fails
     }
 
     console.log('Updated request:', {
@@ -460,38 +450,31 @@ const acceptRequest = async (req, res) => {
   }
 };
 
-// Generate maintenance report
+//generate maintenance report
 const generateReport = async (req, res) => {
   try {
-    // Fetch all maintenance requests
     const requests = await maintenanceModel.find().sort({ date: -1 });
 
-    // Create a new PDF document
     const doc = new PDFDocument();
     const filename = `maintenance_report_${new Date().toISOString().split('T')[0]}.pdf`;
 
-    // Set response headers for PDF download
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
 
-    // Pipe the PDF to the response
     doc.pipe(res);
 
-    // Add title
     doc.fontSize(20).text('Maintenance Requests Report', { align: 'center' });
     doc.moveDown();
 
-    // Add date
     doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: 'right' });
     doc.moveDown();
 
-    // Calculate statistics
     const totalRequests = requests.length;
     const acceptedRequests = requests.filter(req => req.status === 'accepted').length;
     const rejectedRequests = requests.filter(req => req.status === 'rejected').length;
     const pendingRequests = requests.filter(req => req.status === 'pending').length;
 
-    // Calculate category distribution
+    //calculations
     const categoryCount = {};
     requests.forEach(req => {
       categoryCount[req.category] = (categoryCount[req.category] || 0) + 1;
@@ -499,7 +482,7 @@ const generateReport = async (req, res) => {
     const mostCommonCategory = Object.entries(categoryCount)
       .sort((a, b) => b[1] - a[1])[0];
 
-    // Calculate house number distribution
+    
     const houseNoCount = {};
     requests.forEach(req => {
       houseNoCount[req.houseNo] = (houseNoCount[req.houseNo] || 0) + 1;
@@ -507,7 +490,7 @@ const generateReport = async (req, res) => {
     const mostCommonHouseNo = Object.entries(houseNoCount)
       .sort((a, b) => b[1] - a[1])[0];
 
-    // Generate pie chart for categories
+    //generate pie chart 
     const width = 400;
     const height = 400;
     const chartCallback = (ChartJS) => {
@@ -517,7 +500,7 @@ const generateReport = async (req, res) => {
 
     const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, chartCallback });
 
-    // Category Pie Chart
+
     const categoryData = {
       labels: Object.keys(categoryCount),
       datasets: [{
@@ -557,7 +540,7 @@ const generateReport = async (req, res) => {
       }
     };
 
-    // House Number Bar Chart
+    //bar chart
     const houseNoData = {
       labels: Object.keys(houseNoCount).map(no => `House ${no}`),
       datasets: [{
@@ -603,11 +586,10 @@ const generateReport = async (req, res) => {
       }
     };
 
-    // Generate both chart images
+    
     const categoryChartImage = await chartJSNodeCanvas.renderToBuffer(categoryConfig);
     const houseNoChartImage = await chartJSNodeCanvas.renderToBuffer(houseNoConfig);
 
-    // Add summary
     doc.fontSize(14).text('Summary', { underline: true });
     doc.fontSize(12)
       .text(`Total Requests: ${totalRequests}`)
@@ -619,11 +601,10 @@ const generateReport = async (req, res) => {
       .text(`Most Common House Number: ${mostCommonHouseNo[0]} (${mostCommonHouseNo[1]} requests)`);
     doc.moveDown();
 
-    // Add category distribution with pie chart
+
     doc.fontSize(14).text('Category Distribution', { underline: true });
     doc.moveDown();
-    
-    // Add the pie chart to the PDF
+
     doc.image(categoryChartImage, {
       fit: [400, 400],
       align: 'center'
@@ -638,18 +619,15 @@ const generateReport = async (req, res) => {
       });
     doc.moveDown();
 
-    // Add house number distribution with bar chart
     doc.fontSize(14).text('House Number Distribution', { underline: true });
     doc.moveDown();
     
-    // Add the bar chart to the PDF
     doc.image(houseNoChartImage, {
       fit: [400, 400],
       align: 'center'
     });
     doc.moveDown();
 
-    // Add house number details
     Object.entries(houseNoCount)
       .sort((a, b) => b[1] - a[1])
       .forEach(([houseNo, count]) => {
@@ -657,7 +635,6 @@ const generateReport = async (req, res) => {
       });
     doc.moveDown();
 
-    // Add detailed request information
     doc.fontSize(14).text('Detailed Request Information', { underline: true });
     doc.moveDown();
 
@@ -681,7 +658,6 @@ const generateReport = async (req, res) => {
       doc.moveDown();
     });
 
-    // Finalize the PDF
     doc.end();
   } catch (error) {
     console.error('Error generating report:', error);

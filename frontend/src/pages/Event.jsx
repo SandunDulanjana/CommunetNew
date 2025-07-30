@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Footer from '../componenets/Footer';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import eventHeroImg from '../assets/eventback.jpg';
+import eventHeroImg from '../assets/eventbak.jpg';
 
 const Event = () => {
   const navigate = useNavigate();
@@ -34,24 +34,24 @@ const Event = () => {
     fetchEvents();
   }, []);
 
-  // Handle clicking an event card
+ 
   const handleEventClick = (event) => {
     setSelectedEvent(event);
     setShowEventDetails(true);
   };
 
-  // Handle the Request button click
+ 
   const handleRequestClick = (event) => {
     setSelectedEvent(event);
     setShowRequestModal(true);
-    setShowEventDetails(false); // Close event details when opening request form
+    setShowEventDetails(false);
   };
 
   const handleRequestSubmit = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        setRequestStatus('Please login to request to join events');
+        navigate('/login');
         return;
       }
 
@@ -149,7 +149,6 @@ const Event = () => {
           <h2 className="text-4xl font-bold text-gray-800">Upcoming Events</h2>
         </div>
 
-        {/* Event Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
           {events.map((event) => (
             <motion.div
@@ -203,7 +202,7 @@ const Event = () => {
           ))}
         </div>
 
-        {/* Event Details Modal */}
+       
         {showEventDetails && selectedEvent && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <motion.div 
@@ -269,8 +268,6 @@ const Event = () => {
             </motion.div>
           </div>
         )}
-
-        {/* Request Modal */}
         {showRequestModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <motion.div 

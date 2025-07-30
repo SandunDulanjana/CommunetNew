@@ -28,7 +28,7 @@ const AddEvent = () => {
                     setOrganizarEmail(decoded.email);
                 }
             } catch (err) {
-                // Invalid token, do nothing
+               
             }
         }
     }, []);
@@ -87,7 +87,7 @@ const AddEvent = () => {
 
                 alert("Event added successfully!");
                 
-                // Clear form fields
+             
                 setEventName('');
                 setOrganizarName('');
                 setDescription('');
