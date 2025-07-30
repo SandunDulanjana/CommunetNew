@@ -140,7 +140,7 @@ const deleteEvent= async (req,res) => {
 
         await eventModel.findByIdAndDelete(eventId)
 
-        return res.json({success: true, message: "Item Delected"})
+        return res.json({success: true, message: "Event Delected"})
 
 
     }catch(error){

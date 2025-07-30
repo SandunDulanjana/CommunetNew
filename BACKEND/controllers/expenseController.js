@@ -3,22 +3,13 @@ import expenseModel from '../models/expenseModel.js';
 
 export const addExpense = async (req, res) => {
   try {
-    console.log('Incoming request body:', req.body);
-    console.log('Incoming file:', req.file);
+    //console.log('Incoming request body:', req.body);
+    //console.log('Incoming file:', req.file);
 
     const { category, title, date, amount, paymentMethod, description } = req.body;
     let docImg = '';
 
-    // Handle Image Upload to Cloudinary
-    if (req.file) {
-      try {
-        const result = await cloudinary.v2.uploader.upload(req.file.path);
-        docImg = result.secure_url;
-      } catch (cloudinaryError) {
-        console.error('Cloudinary upload error:', cloudinaryError);
-        return res.status(500).json({ message: 'Image upload failed', error: cloudinaryError });
-      }
-    }
+    
 
     // Check if required fields are provided
     if (!category || !title || !date || !amount || !paymentMethod || !description) {
@@ -52,17 +43,6 @@ export const updateExpense = async (req, res) => {
     const { category, title, date, amount, paymentMethod, description } = req.body;
     const expenseId = req.params.id;
     let docImg = '';
-
-    // Handle Image Upload to Cloudinary
-    if (req.file) {
-      try {
-        const result = await cloudinary.v2.uploader.upload(req.file.path);
-        docImg = result.secure_url;
-      } catch (cloudinaryError) {
-        console.error('Cloudinary upload error:', cloudinaryError);
-        return res.status(500).json({ message: 'Image upload failed', error: cloudinaryError });
-      }
-    }
 
     // Find the expense by ID
     const expense = await expenseModel.findById(expenseId);

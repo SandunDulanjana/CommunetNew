@@ -1,23 +1,22 @@
 import React, { useState } from "react";
 import apartmentImage from "../assets/aprtmentL.jpg";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // 👁️ import icons
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext"; // ✅ Import Auth Context
 
 const LogIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 👁️ toggle state
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ Use login from AuthContext
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "email") {
-      setEmail(value);
-    } else if (name === "password") {
-      setPassword(value);
-    }
+    if (name === "email") setEmail(value);
+    else if (name === "password") setPassword(value);
   };
 
   const handleSubmit = async (e) => {
@@ -29,10 +28,20 @@ const LogIn = () => {
       });
 
       if (response.data.success) {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("type", response.data.memberType);
-        window.dispatchEvent(new Event("storage"));
+        // Create user object from response
+        const user = {
+          token: response.data.token,
+          memberType: response.data.memberType,
+          email: response.data.email,
+          id: response.data.id,
+          name: response.data.name,
+        };
 
+        login(user); // ✅ Set user in context and localStorage
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("token", user.token); // <-- Add this line!
+
+        // Redirect based on memberType
         switch (response.data.memberType) {
           case "electioncoordinator":
             navigate("/ElectionCoPage");
@@ -54,7 +63,6 @@ const LogIn = () => {
             break;
           default:
             navigate("/RUserProfile");
-            setMessage(response.data.message);
             break;
         }
       } else {
@@ -77,7 +85,6 @@ const LogIn = () => {
           <div className="mb-4 text-center text-red-600 font-medium">{message}</div>
         )}
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Email Field */}
           <div>
             <label className="block text-blue-900 text-sm font-semibold mb-2">Email</label>
             <input
@@ -91,7 +98,6 @@ const LogIn = () => {
             />
           </div>
 
-          {/* Password Field with Eye Icon */}
           <div>
             <label className="block text-blue-900 text-sm font-semibold mb-2">Password</label>
             <div className="relative">
@@ -113,7 +119,6 @@ const LogIn = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-lg transition shadow-lg"

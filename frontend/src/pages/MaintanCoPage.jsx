@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Footer from '../componenets/Footer';
 import { FaDownload } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion';
 
 function MaintanCoPage() {
   const [requests, setRequests] = useState([]);
@@ -24,7 +23,6 @@ function MaintanCoPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generatingReport, setGeneratingReport] = useState(false);
   const [activeTab, setActiveTab] = useState('pending'); // New state for active tab
-  const [notification, setNotification] = useState({ show: false, message: '', type: '' });
 
   useEffect(() => {
     const fetchMaintenance = async () => {
@@ -112,14 +110,6 @@ function MaintanCoPage() {
     });
   };
 
-  // Function to show notification
-  const showNotification = (message, type = 'success') => {
-    setNotification({ show: true, message, type });
-    setTimeout(() => {
-      setNotification({ show: false, message: '', type: '' });
-    }, 5000);
-  };
-
   const handleAccept = async (id) => {
     try {
       const response = await axios.post(
@@ -134,13 +124,13 @@ function MaintanCoPage() {
         setFilteredRequests(prevRequests => 
           prevRequests.filter(request => request._id !== id)
         );
-        showNotification('Request accepted and notification email sent successfully');
+        alert('Request accepted successfully');
       } else {
         throw new Error(response.data.message || 'Failed to accept request');
       }
     } catch (error) {
       console.error('Error accepting request:', error);
-      showNotification(error.response?.data?.message || 'Failed to accept request', 'error');
+      alert(error.response?.data?.message || 'Failed to accept request');
     }
   };
 
@@ -151,7 +141,7 @@ function MaintanCoPage() {
 
   const handleRejectSubmit = async () => {
     if (!rejectionReason.trim()) {
-      showNotification('Please provide a reason for rejection', 'error');
+      alert('Please provide a reason for rejection');
       return;
     }
 
@@ -174,10 +164,10 @@ function MaintanCoPage() {
       setShowRejectDialog(false);
       setSelectedRequestId(null);
       setRejectionReason('');
-      showNotification('Request rejected and notification email sent successfully');
+      alert('Request rejected successfully');
     } catch (error) {
       console.error('Error rejecting request:', error);
-      showNotification(error.response?.data?.message || 'Failed to reject request', 'error');
+      alert(error.response?.data?.message || 'Failed to reject request');
     } finally {
       setIsSubmitting(false);
     }
@@ -233,22 +223,6 @@ function MaintanCoPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
-      {/* Notification */}
-      <AnimatePresence>
-        {notification.show && (
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-              notification.type === 'error' ? 'bg-red-500' : 'bg-green-500'
-            } text-white`}
-          >
-            {notification.message}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Maintenance Requests</h1>
         <button

@@ -56,7 +56,7 @@ const AddMaintenance = () => {
         const { name, value, files } = e.target;
         setFormData({
             ...formData,
-            [name]: files ? files[0] : value, // Files are always in a list
+            [name]: files ? files[0] : value,
         });
     };
 
@@ -77,7 +77,6 @@ const AddMaintenance = () => {
 
             if (data.success) {
                 alert("Maintenance request submitted successfully!");
-                // Redirect to MyMaintenance page
                 navigate('/MyMaintance');
             } else {
                 alert(`Failed to submit request: ${data.message}`);

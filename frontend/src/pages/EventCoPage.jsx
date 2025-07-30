@@ -33,7 +33,7 @@ const EventCoPage = () => {
         fetchEvents();
     }, []);
 
-    // Update event status
+   
     const updateStatus = async (id, status, reason = '') => {
         try {
             const token = localStorage.getItem("token");
@@ -65,7 +65,7 @@ const EventCoPage = () => {
                 reason: reason
             };
 
-            console.log('Sending update data:', updateData); // Debug log
+            console.log('Sending update data:', updateData); 
 
             const response = await axios.put(
                 `http://localhost:5000/api/event/update-event/${id}`,
@@ -221,7 +221,7 @@ const EventCoPage = () => {
                     </table>
                 </div>
 
-                {/* Approve Confirmation Modal */}
+               
                 {showApproveModal && selectedEvent && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                         <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
@@ -255,7 +255,7 @@ const EventCoPage = () => {
                     </div>
                 )}
 
-                {/* Reject Reason Modal */}
+               
                 {showRejectModal && selectedEvent && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                         <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">

@@ -18,7 +18,6 @@ const EditMaintenance = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentImage, setCurrentImage] = useState('');
 
-  // Fetch maintenance request details
   useEffect(() => {
     const fetchMaintenance = async () => {
       try {
@@ -54,14 +53,12 @@ const EditMaintenance = () => {
     try {
       const formDataObj = new FormData();
 
-      // Add all maintenance data to FormData
       Object.keys(maintenance).forEach((key) => {
-        if (key !== 'images') { // Don't append the old image URL
+        if (key !== 'images') { 
           formDataObj.append(key, maintenance[key]);
         }
       });
 
-      // Append new image if selected
       if (selectedImage) {
         formDataObj.append('images', selectedImage);
       }
@@ -78,7 +75,6 @@ const EditMaintenance = () => {
         currentImage: currentImage
       });
 
-      // Make the PUT request to update the maintenance request
       const { data } = await axios.put(
         `http://localhost:5000/api/maintenance/UpdateMaintenanceRequest/${id}`,
         formDataObj,
@@ -147,7 +143,6 @@ const EditMaintenance = () => {
             />
           </div>
 
-          {/* Maintenance Type (Dropdown) */}
           <div className="mb-4">
             <label className="block">Maintenance Type:</label>
             <select
@@ -164,7 +159,6 @@ const EditMaintenance = () => {
             </select>
           </div>
 
-          {/* Description */}
           <div className="mb-4">
             <label className="block">Description:</label>
             <textarea
@@ -175,7 +169,6 @@ const EditMaintenance = () => {
             />
           </div>
 
-          {/* Priority (Radio Buttons with space) */}
           <div className="mb-4">
             <label className="block">Priority:</label>
             <div className="flex space-x-4">
@@ -217,7 +210,6 @@ const EditMaintenance = () => {
             </div>
           </div>
 
-          {/* Image Upload and Preview */}
           <div className="mb-4">
             <label className="block">Current Image:</label>
             {currentImage && (

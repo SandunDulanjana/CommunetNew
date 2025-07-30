@@ -98,10 +98,10 @@ export const votePoll = async (req, res) => {
     const userId = decoded.id;
 
     // Log for debugging
-    console.log('Poll ID:', req.params.id);
-    console.log('Option Index:', optionIndex);
-    console.log('User ID:', userId);
-    console.log('Poll exists:', !!poll);
+   // console.log('Poll ID:', req.params.id);
+    //console.log('Option Index:', optionIndex);
+    //console.log('User ID:', userId);
+   // console.log('Poll exists:', !!poll);
     if (poll) {
       console.log('Poll closed:', poll.closed);
       console.log('Poll options length:', poll.options.length);
