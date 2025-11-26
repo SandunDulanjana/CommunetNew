@@ -1,8 +1,4 @@
-Here is a **clean, professional, ready-to-use README.md** for your project **CommunetNew**, updated to clearly describe that it is a *community/ apartment-based management system*.
 
-You can copy–paste this directly into your GitHub.
-
----
 
 # **CommunetNew**
 
